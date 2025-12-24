@@ -24,7 +24,7 @@ Every 2 seconds, someone needs blood, yet **38% of blood requests go unfulfilled
 
 </td>
 <td width="40%">
-<img src="https://media.giphy.com/media/3o7btPCcdNniyf0ArS/giphy.gif" width="100%">
+<img src="image.png" width="100%" alt="BloodLink Landing Page">
 </td>
 </tr>
 </table>
@@ -358,7 +358,7 @@ node seedHospitalCredentials.js
       </td>
       <td align="center">
         <h3>🧑‍💻 Harsh Patil</h3>
-        <p>Backend Developer</p>
+        <p>Frontend Developer</p>
         <a href="https://linkedin.com/in/harsh-patil" target="_blank">
           <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
         </a>
@@ -374,7 +374,7 @@ node seedHospitalCredentials.js
       </td>
       <td align="center">
         <h3>🧑‍💻 Nachiket Kale</h3>
-        <p>UI/UX Designer & Developer</p>
+        <p>Team Leader</p>
         <a href="https://linkedin.com/in/nachiket-kale" target="_blank">
           <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
         </a>

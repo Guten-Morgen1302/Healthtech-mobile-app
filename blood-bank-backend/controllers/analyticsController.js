@@ -25,17 +25,17 @@ exports.getDashboardAnalytics = async (req, res) => {
           total: { $sum: 1 },
           available: {
             $sum: {
-              $cond: [{ $eq: ['$Status', 'available'] }, 1, 0]
+              $cond: [{ $eq: ['$status', 'available'] }, 1, 0]
             }
           },
           reserved: {
             $sum: {
-              $cond: [{ $eq: ['$Status', 'reserved'] }, 1, 0]
+              $cond: [{ $eq: ['$status', 'reserved'] }, 1, 0]
             }
           },
           used: {
             $sum: {
-              $cond: [{ $eq: ['$Status', 'used'] }, 1, 0]
+              $cond: [{ $eq: ['$status', 'used'] }, 1, 0]
             }
           }
         }
@@ -125,8 +125,8 @@ exports.getDashboardAnalytics = async (req, res) => {
     sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
     
     const expiringUnits = await BloodSpecimen.countDocuments({
-      expiryDate: { $lte: sevenDaysFromNow },
-      Status: 'available'
+      expiryDate: { $lte: sevenDaysFromNow, $gte: new Date() },
+      status: 'available'
     });
 
     // Low stock alerts (< 5 units)

@@ -63,6 +63,7 @@ app.use('/api/rewards', require('./routes/reward.routes'));
 app.use('/api/camps', require('./routes/camp.routes'));
 app.use('/api/qr', require('./routes/qr.routes'));
 app.use('/api/analytics', require('./routes/analytics.routes'));
+app.use('/api/eraktkosh', require('./routes/eraktkosh.routes'));
 
 // Root route
 app.get('/', (req, res) => {

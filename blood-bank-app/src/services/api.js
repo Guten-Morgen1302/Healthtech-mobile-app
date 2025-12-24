@@ -44,7 +44,7 @@ API.interceptors.response.use(
         // Unauthorized hospital - clear hospital token and redirect to hospital login
         localStorage.removeItem('hospitalToken');
         localStorage.removeItem('hospital');
-        window.location.href = '/hospital/login';
+        window.location.href = '/login';
       } else {
         // Unauthorized admin - clear token and redirect to admin login
         localStorage.removeItem('token');

@@ -1,7 +1,9 @@
 import React from 'react';
 import { Heart, Droplets, Award, TrendingUp, Download } from 'lucide-react';
+import { useToast } from '../../context/ToastContext';
 
 const DonorImpactTracker = ({ donorData }) => {
+  const { info } = useToast();
   const {
     totalDonations = 0,
     livesSaved = 0,
@@ -17,7 +19,7 @@ const DonorImpactTracker = ({ donorData }) => {
   const lives = livesSaved || calculateLivesSaved(totalDonations);
 
   const downloadCertificate = () => {
-    alert('Certificate download feature - Coming soon!');
+    info('Coming Soon!', 'Certificate download feature will be available soon');
   };
 
   return (

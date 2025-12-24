@@ -2,8 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { hospitalsAPI, citiesAPI } from '../services/api';
+import { fetchNearbyFacilities, getCurrentLocation } from '../services/eRaktKoshService';
 import DataTable from '../components/shared/DataTable';
-import { Plus, Edit, Trash2, Loader2, Search, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Search, X, Globe, MapPin, Phone, Mail, Building2, Navigation, RefreshCw } from 'lucide-react';
 
 
 const HospitalsPage = () => {
@@ -25,6 +26,15 @@ const HospitalsPage = () => {
     password: '',
     isApproved: true // Auto-approve when admin creates
   });
+
+  // eRaktKosh integration states
+  const [activeTab, setActiveTab] = useState('internal'); // 'internal' or 'eraktkosh'
+  const [eraktKoshFacilities, setEraktKoshFacilities] = useState([]);
+  const [eraktKoshLoading, setEraktKoshLoading] = useState(false);
+  const [eraktKoshError, setEraktKoshError] = useState('');
+  const [userLocation, setUserLocation] = useState(null);
+  const [searchRadius, setSearchRadius] = useState(10);
+  const [selectedFacility, setSelectedFacility] = useState(null);
 
   // Fetch cities from API
   const fetchCities = useCallback(async () => {
@@ -64,6 +74,62 @@ const HospitalsPage = () => {
     fetchCities();
     fetchHospitals();
   }, [fetchCities, fetchHospitals]);
+
+  // eRaktKosh integration functions
+  const fetchUserLocation = async () => {
+    setEraktKoshLoading(true);
+    setEraktKoshError('');
+    
+    try {
+      const location = await getCurrentLocation();
+      setUserLocation(location);
+      await searchEraktKoshFacilities(location.latitude, location.longitude);
+    } catch (err) {
+      setEraktKoshError(err.message || 'Failed to get your location');
+      setEraktKoshLoading(false);
+    }
+  };
+
+  const searchEraktKoshFacilities = async (lat, long) => {
+    setEraktKoshLoading(true);
+    setEraktKoshError('');
+
+    try {
+      const results = await fetchNearbyFacilities(
+        lat || userLocation?.latitude,
+        long || userLocation?.longitude,
+        searchRadius
+      );
+
+      if (!results || results.length === 0) {
+        setEraktKoshError(`No facilities found within ${searchRadius}km. Try increasing the search radius.`);
+        setEraktKoshFacilities([]);
+      } else {
+        setEraktKoshFacilities(results);
+        setSelectedFacility(results[0]);
+      }
+    } catch (err) {
+      console.error('eRaktKosh search error:', err);
+      setEraktKoshError(err.message || 'Failed to fetch facilities from eRaktKosh');
+      setEraktKoshFacilities([]);
+    } finally {
+      setEraktKoshLoading(false);
+    }
+  };
+
+  const handleRadiusChange = (newRadius) => {
+    setSearchRadius(newRadius);
+    if (userLocation) {
+      searchEraktKoshFacilities(userLocation.latitude, userLocation.longitude);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'eraktkosh' && !userLocation) {
+      fetchUserLocation();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
 
   const handleDelete = async (id) => {
     if (user?.role !== 'manager') {
@@ -246,54 +312,294 @@ const HospitalsPage = () => {
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h3 className="text-2xl font-semibold text-zinc-900 mb-1">Hospital Network</h3>
-          <p className="text-zinc-600">Manage partner hospitals and blood distribution</p>
+          <p className="text-zinc-600">Manage partner hospitals and explore nationwide facilities</p>
         </div>
-        {user?.role === 'manager' ? (
-          <button 
-            onClick={handleAddClick}
-            // FIXED: Combined className and placed icon inside
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 shadow-sm duration-150 flex items-center gap-2 rounded-lg transition-colors"
+        <div className="flex items-center gap-2">
+          <a 
+            href="https://facilitysbx.abdm.gov.in/v2/api-docs" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full text-white text-xs font-medium flex items-center gap-1.5 hover:shadow-lg transition-all"
           >
-            <Plus className="h-5 w-5" />
-            Add New Hospital
-          </button>
-        ) : (
-          <div className="text-sm text-zinc-500 bg-gray-100 px-4 py-2 rounded-lg">
-            Manager Access Required
-          </div>
-        )}
+            <Globe className="h-3 w-3" />
+            ABDM Network
+          </a>
+          {user?.role === 'manager' && (
+            <button 
+              onClick={handleAddClick}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 shadow-sm duration-150 flex items-center gap-2 rounded-lg transition-colors"
+            >
+              <Plus className="h-5 w-5" />
+              Add Hospital
+            </button>
+          )}
+        </div>
       </div>
 
-      {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
-          <p>{error}</p>
-          <button 
-            onClick={fetchHospitals}
-            className="mt-2 text-sm underline font-medium"
-          >
-            Try Again
-          </button>
-        </div>
+      {/* Tab Navigation */}
+      <div className="mb-6 bg-white rounded-lg shadow-sm border border-zinc-200 p-1 flex gap-1">
+        <button
+          onClick={() => setActiveTab('internal')}
+          className={`flex-1 px-4 py-2.5 rounded-md font-medium transition-all ${
+            activeTab === 'internal'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
+          }`}
+        >
+          <span className="flex items-center justify-center gap-2">
+            <Building2 className="h-4 w-4" />
+            Internal Network ({hospitals.length})
+          </span>
+        </button>
+        <button
+          onClick={() => setActiveTab('eraktkosh')}
+          className={`flex-1 px-4 py-2.5 rounded-md font-medium transition-all ${
+            activeTab === 'eraktkosh'
+              ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-sm'
+              : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
+          }`}
+        >
+          <span className="flex items-center justify-center gap-2">
+            <Globe className="h-4 w-4" />
+            ABDM Network Search
+          </span>
+        </button>
+      </div>
+
+      {/* Internal Network Tab */}
+      {activeTab === 'internal' && (
+        <>
+          {user?.role !== 'manager' && (
+            <div className="mb-4 text-sm text-zinc-500 bg-gray-100 px-4 py-2 rounded-lg">
+              Manager Access Required to Add/Edit Hospitals
+            </div>
+          )}
+
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+              <p>{error}</p>
+              <button 
+                onClick={fetchHospitals}
+                className="mt-2 text-sm underline font-medium"
+              >
+                Try Again
+              </button>
+            </div>
+          )}
+
+          <div className="mb-6 bg-white p-4 rounded-lg shadow-sm border border-zinc-200">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400" />
+              <input
+                type="text"
+                placeholder="Search by name, city, or type..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              />
+            </div>
+          </div>
+
+          <DataTable columns={columns} data={filteredHospitals} />
+          
+          <div className="mt-4 flex items-center justify-between text-sm text-zinc-600">
+            <p>Showing {filteredHospitals.length} of {hospitals.length} hospitals</p>
+          </div>
+        </>
       )}
 
-      <div className="mb-6 bg-white p-4 rounded-lg shadow-sm border border-zinc-200">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400" />
-          <input
-            type="text"
-            placeholder="Search by name, city, or type..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-          />
-        </div>
-      </div>
+      {/* eRaktKosh Tab */}
+      {activeTab === 'eraktkosh' && (
+        <div className="space-y-4">
+          {/* Search Controls */}
+          <div className="bg-white p-4 rounded-lg shadow-sm border border-zinc-200">
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-zinc-600">Search Radius:</span>
+                {[5, 10, 20, 50].map((radius) => (
+                  <button
+                    key={radius}
+                    onClick={() => handleRadiusChange(radius)}
+                    disabled={eraktKoshLoading}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                      searchRadius === radius
+                        ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-lg shadow-teal-500/30'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50'
+                    }`}
+                  >
+                    {radius} km
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => userLocation ? searchEraktKoshFacilities(userLocation.latitude, userLocation.longitude) : fetchUserLocation()}
+                disabled={eraktKoshLoading}
+                className="ml-auto px-4 py-2 bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-medium rounded-lg shadow-lg hover:shadow-teal-500/40 transition-all flex items-center gap-2 disabled:opacity-50"
+              >
+                {eraktKoshLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4" />
+                )}
+                {eraktKoshLoading ? 'Searching...' : 'Refresh'}
+              </button>
+            </div>
+          </div>
 
-      <DataTable columns={columns} data={filteredHospitals} />
-      
-      <div className="mt-4 flex items-center justify-between text-sm text-zinc-600">
-        <p>Showing {filteredHospitals.length} of {hospitals.length} hospitals</p>
-      </div>
+          {/* Error State */}
+          {eraktKoshError && (
+            <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+              <p>{eraktKoshError}</p>
+            </div>
+          )}
+
+          {/* Loading State */}
+          {eraktKoshLoading && (
+            <div className="bg-white p-12 rounded-lg shadow-sm border border-zinc-200 flex flex-col items-center justify-center gap-4">
+              <Loader2 className="h-12 w-12 text-teal-500 animate-spin" />
+              <p className="text-zinc-600 font-medium">Searching nationwide facilities...</p>
+            </div>
+          )}
+
+          {/* Results */}
+          {!eraktKoshLoading && eraktKoshFacilities.length > 0 && (
+            <div className="grid lg:grid-cols-2 gap-4">
+              {/* Facility List */}
+              <div className="bg-white p-4 rounded-lg shadow-sm border border-zinc-200 space-y-3 max-h-[600px] overflow-y-auto">
+                <h3 className="text-lg font-semibold text-zinc-900 mb-4 flex items-center gap-2">
+                  <Building2 className="h-5 w-5 text-teal-500" />
+                  Found {eraktKoshFacilities.length} Facilities
+                </h3>
+
+                {eraktKoshFacilities.map((facility) => (
+                  <div
+                    key={facility.id}
+                    onClick={() => setSelectedFacility(facility)}
+                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                      selectedFacility?.id === facility.id
+                        ? 'border-teal-500 bg-teal-50'
+                        : 'border-zinc-200 bg-white hover:border-teal-200 hover:shadow-md'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-bold text-zinc-800 line-clamp-2 flex-1">
+                        {facility.name}
+                      </h4>
+                      {facility.distance && (
+                        <div className="flex items-center gap-1 text-sm text-teal-600 font-medium ml-2">
+                          <Navigation className="h-3.5 w-3.5" />
+                          {facility.distance.toFixed(1)} km
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-start gap-2 text-sm text-zinc-600">
+                      <MapPin className="h-3.5 w-3.5 text-zinc-400 flex-shrink-0 mt-0.5" />
+                      <span className="line-clamp-2">{facility.address}</span>
+                    </div>
+                    {facility.city && facility.state && (
+                      <div className="text-xs text-zinc-500 mt-1 ml-5">
+                        {facility.city}, {facility.state}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Facility Details */}
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-zinc-200 sticky top-6">
+                {selectedFacility ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 pb-4 border-b border-zinc-200">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-500 flex items-center justify-center flex-shrink-0">
+                        <Building2 className="h-6 w-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-zinc-900">{selectedFacility.name}</h3>
+                        <span className="text-xs text-teal-600 font-medium">
+                          {selectedFacility.facilityType || 'Blood Bank'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      {selectedFacility.address && (
+                        <div className="flex items-start gap-3 p-3 bg-zinc-50 rounded-lg">
+                          <MapPin className="h-5 w-5 text-zinc-400 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-sm font-medium text-zinc-900">{selectedFacility.address}</p>
+                            {selectedFacility.city && selectedFacility.state && (
+                              <p className="text-xs text-zinc-600 mt-1">
+                                {selectedFacility.city}, {selectedFacility.state}
+                                {selectedFacility.pincode && ` - ${selectedFacility.pincode}`}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {selectedFacility.contact && selectedFacility.contact !== 'N/A' && (
+                        <div className="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg">
+                          <Phone className="h-5 w-5 text-zinc-400 flex-shrink-0" />
+                          <div>
+                            <p className="text-xs text-zinc-500">Contact</p>
+                            <a 
+                              href={`tel:${selectedFacility.contact}`}
+                              className="text-sm font-semibold text-teal-600 hover:text-teal-700"
+                            >
+                              {selectedFacility.contact}
+                            </a>
+                          </div>
+                        </div>
+                      )}
+
+                      {selectedFacility.email && selectedFacility.email !== 'N/A' && (
+                        <div className="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg">
+                          <Mail className="h-5 w-5 text-zinc-400 flex-shrink-0" />
+                          <div>
+                            <p className="text-xs text-zinc-500">Email</p>
+                            <a 
+                              href={`mailto:${selectedFacility.email}`}
+                              className="text-sm font-semibold text-teal-600 hover:text-teal-700 break-all"
+                            >
+                              {selectedFacility.email}
+                            </a>
+                          </div>
+                        </div>
+                      )}
+
+                      {selectedFacility.distance && (
+                        <div className="flex items-center gap-3 p-3 bg-teal-50 rounded-lg border border-teal-100">
+                          <Navigation className="h-5 w-5 text-teal-600 flex-shrink-0" />
+                          <div>
+                            <p className="text-xs text-teal-700">Distance</p>
+                            <p className="text-sm font-bold text-teal-900">
+                              {selectedFacility.distance.toFixed(1)} km away
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-64 text-zinc-400">
+                    <Building2 className="h-16 w-16 mb-4" />
+                    <p className="text-sm">Select a facility to view details</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* No Results */}
+          {!eraktKoshLoading && !eraktKoshError && eraktKoshFacilities.length === 0 && (
+            <div className="bg-white p-12 rounded-lg shadow-sm border border-zinc-200 flex flex-col items-center justify-center text-center">
+              <Building2 className="h-16 w-16 text-zinc-300 mb-4" />
+              <h3 className="text-lg font-semibold text-zinc-800 mb-2">No Facilities Found</h3>
+              <p className="text-sm text-zinc-500">Click "Refresh" to search for nearby blood bank facilities</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Modal for Add/Edit Hospital */}
       {showModal && (

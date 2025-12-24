@@ -24,6 +24,7 @@ const DonorsPage = () => {
     Bd_Age: '',
     Bd_Sex: ''
   });
+  const [confirmDialog, setConfirmDialog] = useState({ show: false, donorId: null, donorName: '' });
 
   // Fetch cities from API
   const fetchCities = useCallback(async () => {
@@ -64,18 +65,25 @@ const DonorsPage = () => {
     fetchDonors();
   }, [fetchCities, fetchDonors]);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this donor?')) {
-      return;
-    }
+  const handleDeleteClick = (id, name) => {
+    setConfirmDialog({ show: true, donorId: id, donorName: name });
+  };
+
+  const handleDeleteConfirm = async () => {
+    const { donorId } = confirmDialog;
+    setConfirmDialog({ show: false, donorId: null, donorName: '' });
 
     try {
-      await donorsAPI.delete(id);
+      await donorsAPI.delete(donorId);
       success('Donor deleted', 'Donor has been removed from the system');
       fetchDonors();
     } catch (err) {
       showError('Failed to delete donor', err.response?.data?.message || 'Please try again later');
     }
+  };
+
+  const handleDeleteReject = () => {
+    setConfirmDialog({ show: false, donorId: null, donorName: '' });
   };
 
   const handleAddClick = () => {
@@ -178,7 +186,7 @@ const DonorsPage = () => {
           </button>
           {user?.role === 'manager' && (
             <button 
-              onClick={() => handleDelete(row._id)}
+              onClick={() => handleDeleteClick(row._id, row.Bd_Name)}
               className="text-red-600 hover:text-red-800 p-1.5 rounded hover:bg-red-50 transition-colors"
               title="Delete donor"
             >
@@ -439,6 +447,41 @@ const DonorsPage = () => {
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors duration-150"
               >
                 {editingDonor ? 'Update Donor' : 'Add Donor'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Dialog */}
+      {confirmDialog.show && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="p-3 bg-red-100 rounded-full">
+                <Trash2 className="h-6 w-6 text-red-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-zinc-900 mb-2">
+                  Delete Donor?
+                </h3>
+                <p className="text-zinc-600">
+                  Are you sure you want to delete <span className="font-semibold">{confirmDialog.donorName}</span>? This action cannot be undone and will permanently remove all their records.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={handleDeleteReject}
+                className="px-4 py-2 text-zinc-700 bg-zinc-100 rounded-lg hover:bg-zinc-200 transition-colors font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+              >
+                Yes, Delete
               </button>
             </div>
           </div>

@@ -6,12 +6,17 @@ const RewardsPage = () => {
   const [rewards, setRewards] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
-  const donorId = 'YOUR_DONOR_ID'; // Replace with actual from auth
+  const donorId = null; // TODO: Get actual donor ID from auth context when donor logs in
 
   useEffect(() => {
-    fetchRewards();
+    // Only fetch donor rewards if valid donor ID exists
+    if (donorId && donorId.match(/^[0-9a-fA-F]{24}$/)) {
+      fetchRewards();
+    } else {
+      setLoading(false);
+    }
     fetchLeaderboard();
-  }, []);
+  }, [donorId]);
 
   const fetchRewards = async () => {
     try {
@@ -19,6 +24,7 @@ const RewardsPage = () => {
       setRewards(response.data.data);
     } catch (err) {
       console.error('Error fetching rewards:', err);
+      setRewards(null);
     } finally {
       setLoading(false);
     }

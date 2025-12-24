@@ -79,11 +79,11 @@ const HospitalRegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-white to-teal-50 flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-lg mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-cyan-600 to-teal-600 rounded-2xl shadow-lg mb-4">
             <Building2 className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-zinc-900 mb-2">Register Hospital</h1>
@@ -108,7 +108,7 @@ const HospitalRegisterPage = () => {
                     value={formData.Hosp_Name}
                     onChange={handleChange}
                     required
-                    className="w-full pl-10 pr-4 py-3 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    className="w-full pl-10 pr-4 py-3 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
                     placeholder="Enter hospital name"
                   />
                 </div>
@@ -127,7 +127,7 @@ const HospitalRegisterPage = () => {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full pl-10 pr-4 py-3 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    className="w-full pl-10 pr-4 py-3 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
                     placeholder="hospital@example.com"
                   />
                 </div>
@@ -147,7 +147,7 @@ const HospitalRegisterPage = () => {
                     onChange={handleChange}
                     required
                     minLength="6"
-                    className="w-full pl-10 pr-4 py-3 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    className="w-full pl-10 pr-4 py-3 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
                     placeholder="Min 6 characters"
                   />
                 </div>
@@ -166,7 +166,7 @@ const HospitalRegisterPage = () => {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     required
-                    className="w-full pl-10 pr-4 py-3 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    className="w-full pl-10 pr-4 py-3 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
                     placeholder="Confirm password"
                   />
                 </div>
@@ -185,7 +185,7 @@ const HospitalRegisterPage = () => {
                     value={formData.Hosp_Phone}
                     onChange={handleChange}
                     required
-                    className="w-full pl-10 pr-4 py-3 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    className="w-full pl-10 pr-4 py-3 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
                     placeholder="+1234567890"
                   />
                 </div>
@@ -202,7 +202,7 @@ const HospitalRegisterPage = () => {
                     name="City_Id"
                     value={formData.City_Id}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors appearance-none bg-white cursor-pointer"
+                    className="w-full pl-10 pr-4 py-3 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors appearance-none bg-white cursor-pointer"
                   >
                     <option value="">Select city</option>
                     {cities.map((city) => (
@@ -224,7 +224,7 @@ const HospitalRegisterPage = () => {
                   value={formData.address}
                   onChange={handleChange}
                   rows="2"
-                  className="w-full px-4 py-3 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
+                  className="w-full px-4 py-3 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors resize-none"
                   placeholder="Hospital address (optional)"
                 />
               </div>
@@ -250,7 +250,7 @@ const HospitalRegisterPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 rounded-lg transition-all duration-150 flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700 text-white font-semibold py-3 rounded-lg transition-all duration-150 flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>
@@ -271,8 +271,8 @@ const HospitalRegisterPage = () => {
             <p className="text-sm text-zinc-600">
               Already have an account?{' '}
               <Link
-                to="/hospital/login"
-                className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                to="/login"
+                className="text-cyan-600 hover:text-cyan-700 font-medium transition-colors"
               >
                 Login here
               </Link>
@@ -282,7 +282,7 @@ const HospitalRegisterPage = () => {
 
         {/* Info Note */}
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-sm text-blue-800 text-center">
+          <p className="text-sm text-cyan-800 text-center">
             <strong>Note:</strong> Your account will be pending admin approval after registration. 
             You'll be able to access the portal once approved.
           </p>

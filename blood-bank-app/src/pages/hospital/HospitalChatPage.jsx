@@ -28,7 +28,7 @@ const HospitalChatPage = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/hospital/login');
+    navigate('/login');
   };
 
   useEffect(() => {

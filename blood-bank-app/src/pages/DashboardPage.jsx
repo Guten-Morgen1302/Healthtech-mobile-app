@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StatCard from '../components/ui/StatCard';
-import { bloodSpecimensAPI, donorsAPI } from '../services/api';
-import { Droplets, Users, CheckCircle, AlertTriangle, Plus, UserPlus, FileText, Loader2 } from 'lucide-react';
+import { analyticsAPI } from '../services/api';
+import { Droplets, Users, CheckCircle, AlertTriangle, Plus, UserPlus, FileText, Loader2, Calendar, Building2 } from 'lucide-react';
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -19,42 +19,37 @@ const DashboardPage = () => {
       setLoading(true);
       setError('');
       
-      // Fetch inventory stats
-      const inventoryResponse = await bloodSpecimensAPI.getInventoryStats();
+      // Fetch comprehensive analytics
+      const response = await analyticsAPI.getDashboard();
       
-      // Fetch donor stats
-      const donorStatsResponse = await donorsAPI.getStats();
-      
-      if (inventoryResponse.data.success && donorStatsResponse.data.success) {
-        const inventoryData = inventoryResponse.data.data;
-        const donorData = donorStatsResponse.data.data;
+      if (response.data.success) {
+        const data = response.data.data;
         
-        // Ensure byBloodGroup is an object, not an array
-        let byBloodGroup = inventoryData.byBloodGroup || {};
-        
-        // If byBloodGroup is an array, convert it to object
-        if (Array.isArray(byBloodGroup)) {
-          const converted = {};
-          byBloodGroup.forEach(item => {
-            if (item._id) {
-              converted[item._id] = item.total || item.count || 0;
-            }
+        // Convert inventory byBloodGroup array to object for easier rendering
+        const byBloodGroup = {};
+        if (data.inventory?.byBloodGroup) {
+          data.inventory.byBloodGroup.forEach(item => {
+            byBloodGroup[item._id] = item.available || 0;
           });
-          byBloodGroup = converted;
         }
         
-        // Combine stats
+        // Combine stats for dashboard display
         setStats({
-          totalUnits: inventoryData.totalUnits || 0,
-          donorsThisMonth: donorData.thisMonth || 0,
-          available: inventoryData.available || 0,
+          totalUnits: data.inventory?.total || 0,
+          donorsThisMonth: data.donors?.thisMonth || 0,
+          available: data.inventory?.available || 0,
           byBloodGroup: byBloodGroup,
-          lowStockGroups: Object.entries(byBloodGroup)
-            .filter(([_, count]) => count < 5)
-            .map(([group]) => group)
+          lowStockGroups: data.inventory?.lowStockGroups || [],
+          expiringUnits: data.inventory?.expiringUnits || 0,
+          pendingRequests: data.requests?.pending || 0,
+          activeEmergencies: data.emergencies?.active || 0,
+          upcomingAppointments: data.appointments?.scheduled || 0,
+          totalDonors: data.donors?.total || 0,
+          fulfillmentRate: data.requests?.fulfillmentRate || 0
         });
       }
     } catch (err) {
+      console.error('Dashboard fetch error:', err);
       setError(err.response?.data?.message || 'Failed to fetch dashboard data');
     } finally {
       setLoading(false);
@@ -114,7 +109,7 @@ const DashboardPage = () => {
             <StatCard
               title="Donors This Month"
               value={stats.donorsThisMonth}
-              detail="New registrations"
+              detail={`Total: ${stats.totalDonors || 0}`}
               icon={Users}
               iconColor="text-blue-600"
             />
@@ -131,6 +126,38 @@ const DashboardPage = () => {
               detail={stats.lowStockGroups.length > 0 ? stats.lowStockGroups.join(', ') : 'All stocked'}
               icon={AlertTriangle}
               iconColor={stats.lowStockGroups.length > 0 ? 'text-amber-600' : 'text-zinc-400'}
+            />
+          </div>
+
+          {/* Secondary Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <StatCard
+              title="Pending Requests"
+              value={stats.pendingRequests}
+              detail="Awaiting fulfillment"
+              icon={FileText}
+              iconColor="text-purple-600"
+            />
+            <StatCard
+              title="Active Emergencies"
+              value={stats.activeEmergencies}
+              detail="Urgent attention needed"
+              icon={AlertTriangle}
+              iconColor="text-red-600"
+            />
+            <StatCard
+              title="Upcoming Appointments"
+              value={stats.upcomingAppointments}
+              detail="Scheduled donations"
+              icon={Calendar}
+              iconColor="text-blue-600"
+            />
+            <StatCard
+              title="Expiring Soon"
+              value={stats.expiringUnits}
+              detail="Within 7 days"
+              icon={AlertTriangle}
+              iconColor="text-orange-600"
             />
           </div>
 
@@ -170,7 +197,7 @@ const DashboardPage = () => {
           {/* Quick Actions Card */}
           <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
             <h3 className="text-lg font-semibold text-zinc-900 mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
               <button 
                 onClick={() => navigate('/inventory')}
                 className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-150 shadow-sm flex items-center justify-center gap-2"
@@ -190,7 +217,42 @@ const DashboardPage = () => {
                 className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-150 shadow-sm flex items-center justify-center gap-2"
               >
                 <FileText className="h-5 w-5" />
-                <span>Process Request</span>
+                <span>Manage Recipients</span>
+              </button>
+              <button 
+                onClick={() => navigate('/appointments')}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-150 shadow-sm flex items-center justify-center gap-2"
+              >
+                <Calendar className="h-5 w-5" />
+                <span>Appointments</span>
+              </button>
+              <button 
+                onClick={() => navigate('/blood-requests')}
+                className="bg-pink-600 hover:bg-pink-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-150 shadow-sm flex items-center justify-center gap-2"
+              >
+                <FileText className="h-5 w-5" />
+                <span>Blood Requests</span>
+              </button>
+              <button 
+                onClick={() => navigate('/emergencies')}
+                className="bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-150 shadow-sm flex items-center justify-center gap-2"
+              >
+                <AlertTriangle className="h-5 w-5" />
+                <span>Emergencies</span>
+              </button>
+              <button 
+                onClick={() => navigate('/hospitals')}
+                className="bg-teal-600 hover:bg-teal-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-150 shadow-sm flex items-center justify-center gap-2"
+              >
+                <Building2 className="h-5 w-5" />
+                <span>Hospitals</span>
+              </button>
+              <button 
+                onClick={() => navigate('/analytics')}
+                className="bg-cyan-600 hover:bg-cyan-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-150 shadow-sm flex items-center justify-center gap-2"
+              >
+                <Droplets className="h-5 w-5" />
+                <span>View Analytics</span>
               </button>
             </div>
           </div>

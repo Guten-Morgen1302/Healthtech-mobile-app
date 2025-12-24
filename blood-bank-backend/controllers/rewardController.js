@@ -6,13 +6,23 @@ const Donor = require('../models/Donor');
 // @access  Public
 exports.getDonorRewards = async (req, res) => {
   try {
-    let reward = await DonorReward.findOne({ donorId: req.params.donorId })
+    const { donorId } = req.params;
+    
+    // Validate ObjectId format
+    if (!donorId || !donorId.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid donor ID format'
+      });
+    }
+    
+    let reward = await DonorReward.findOne({ donorId })
       .populate('donorId', 'Bd_Name Bd_Phone Bd_Bgroup');
 
     if (!reward) {
       // Create new reward record if doesn't exist
       reward = await DonorReward.create({ 
-        donorId: req.params.donorId,
+        donorId: donorId,
         totalPoints: 0,
         transactions: []
       });

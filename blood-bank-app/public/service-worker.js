@@ -35,6 +35,16 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event
 self.addEventListener('fetch', (event) => {
+  // Skip non-http(s) requests (like chrome-extension://)
+  if (!event.request.url.startsWith('http')) {
+    return;
+  }
+
+  // Skip API requests from caching
+  if (event.request.url.includes('/api/')) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
@@ -49,16 +59,27 @@ self.addEventListener('fetch', (event) => {
               return response;
             }
 
+            // Only cache same-origin requests
+            if (new URL(event.request.url).origin !== location.origin) {
+              return response;
+            }
+
             const responseToCache = response.clone();
 
             caches.open(CACHE_NAME)
               .then((cache) => {
                 cache.put(event.request, responseToCache);
+              })
+              .catch((err) => {
+                console.warn('Cache put failed:', err);
               });
 
             return response;
           }
-        );
+        ).catch(() => {
+          // Return offline fallback if available
+          return caches.match('/');
+        });
       })
   );
 });

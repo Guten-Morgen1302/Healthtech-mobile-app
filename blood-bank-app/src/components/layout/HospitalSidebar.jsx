@@ -1,22 +1,12 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Droplets, Users, Heart, Building2, MessageSquare, Package, X, AlertCircle, Calendar, Trophy, Tent, Map, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, Package, MessageSquare, X, Building2 } from 'lucide-react';
 
-const Sidebar = ({ isOpen, toggleSidebar }) => {
+const HospitalSidebar = ({ isOpen, toggleSidebar }) => {
   const navItems = [
-    { name: 'Dashboard', path: '/app/dashboard', icon: LayoutDashboard },
-    { name: 'Inventory', path: '/app/inventory', icon: Droplets },
-    { name: 'Donors', path: '/app/donors', icon: Users },
-    { name: 'Recipients', path: '/app/recipients', icon: Heart },
-    { name: 'Hospitals', path: '/app/hospitals', icon: Building2 },
-    { name: 'Hospital Chats', path: '/app/chat', icon: MessageSquare },
-    { name: 'Blood Requests', path: '/app/requests', icon: Package },
-    { name: 'Emergency SOS', path: '/app/emergency', icon: AlertCircle },
-    { name: 'Appointments', path: '/app/appointments', icon: Calendar },
-    { name: 'Rewards', path: '/app/rewards', icon: Trophy },
-    { name: 'Donation Camps', path: '/app/camps', icon: Tent },
-    { name: 'Blood Stock Map', path: '/app/map', icon: Map },
-    { name: 'Analytics', path: '/app/analytics', icon: BarChart3 },
+    { name: 'Dashboard', path: '/hospital/dashboard', icon: LayoutDashboard },
+    { name: 'My Requests', path: '/hospital/requests', icon: Package },
+    { name: 'Chat with Admin', path: '/hospital/chat', icon: MessageSquare },
   ];
 
   return (
@@ -38,9 +28,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         <div className="p-5 border-b border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 backdrop-blur-lg rounded-xl flex items-center justify-center border border-white/20">
-              <Heart className="h-5 w-5 text-white" />
+              <Building2 className="h-5 w-5 text-white" />
             </div>
-            <span className="text-lg font-semibold">HealthTech</span>
+            <span className="text-lg font-semibold">Hospital Portal</span>
           </div>
           
           {/* Close button for mobile */}
@@ -81,11 +71,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         
         <div className="p-5 border-t border-white/10">
           <p className="text-xs text-white/50">© 2024 HealthTech</p>
-          <p className="text-xs text-white/30 mt-0.5">v2.0.0</p>
+          <p className="text-xs text-white/30 mt-0.5">Hospital Portal v2.0</p>
         </div>
       </div>
     </>
   );
 };
 
-export default Sidebar;
+export default HospitalSidebar;

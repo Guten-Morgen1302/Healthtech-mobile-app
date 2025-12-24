@@ -16,7 +16,9 @@ const EnhancedAnalyticsPage = () => {
   const fetchAnalytics = async () => {
     try {
       const response = await analyticsAPI.getDashboard();
-      setAnalytics(response.data.data);
+      if (response.data.success) {
+        setAnalytics(response.data.data);
+      }
     } catch (err) {
       console.error('Error fetching analytics:', err);
     } finally {
@@ -35,9 +37,26 @@ const EnhancedAnalyticsPage = () => {
     );
   }
 
-  const inventoryData = analytics?.inventoryByBloodGroup || [];
-  const donationTrends = analytics?.donationTrends || [];
-  const topDonors = analytics?.topDonors || [];
+  // Parse analytics data
+  const inventoryData = analytics?.inventory?.byBloodGroup?.map(item => ({
+    _id: item._id,
+    totalUnits: item.total || 0,
+    available: item.available || 0,
+    reserved: item.reserved || 0,
+    used: item.used || 0
+  })) || [];
+  
+  const donationTrends = analytics?.donations?.trends?.map(item => ({
+    month: `${item._id.year}-${String(item._id.month).padStart(2, '0')}`,
+    count: item.count
+  })) || [];
+  
+  const topDonors = analytics?.donors?.topDonors?.map((donor, idx) => ({
+    donorName: donor.donorId?.Bd_Name || donor.donorId?.name || 'Unknown',
+    bloodGroup: donor.donorId?.Bd_Bgroup || donor.donorId?.bloodGroup || 'N/A',
+    donationCount: donor.totalDonations || donor.donationCount || 0,
+    totalPoints: donor.totalPoints || 0
+  })) || [];
 
   return (
     <div className="p-6">
@@ -56,8 +75,8 @@ const EnhancedAnalyticsPage = () => {
             <Droplets className="h-8 w-8" />
             <span className="text-sm opacity-80">Total Units</span>
           </div>
-          <div className="text-3xl font-bold">{analytics?.totalInventory || 0}</div>
-          <div className="text-sm opacity-90 mt-1">Blood Inventory</div>
+          <div className="text-3xl font-bold">{analytics?.inventory?.total || 0}</div>
+          <div className="text-sm opacity-90 mt-1">Available: {analytics?.inventory?.available || 0}</div>
         </div>
 
         <div className="bg-gradient-to-br from-green-600 to-green-700 text-white rounded-lg p-6 shadow-lg">
@@ -65,8 +84,8 @@ const EnhancedAnalyticsPage = () => {
             <Users className="h-8 w-8" />
             <span className="text-sm opacity-80">Active Donors</span>
           </div>
-          <div className="text-3xl font-bold">{analytics?.donorStats?.totalDonors || 0}</div>
-          <div className="text-sm opacity-90 mt-1">This Month: {analytics?.donorStats?.donorsThisMonth || 0}</div>
+          <div className="text-3xl font-bold">{analytics?.donors?.total || 0}</div>
+          <div className="text-sm opacity-90 mt-1">This Month: {analytics?.donors?.thisMonth || 0}</div>
         </div>
 
         <div className="bg-gradient-to-br from-purple-600 to-purple-700 text-white rounded-lg p-6 shadow-lg">
@@ -74,9 +93,9 @@ const EnhancedAnalyticsPage = () => {
             <Calendar className="h-8 w-8" />
             <span className="text-sm opacity-80">Appointments</span>
           </div>
-          <div className="text-3xl font-bold">{analytics?.appointmentStats?.totalAppointments || 0}</div>
+          <div className="text-3xl font-bold">{analytics?.appointments?.total || 0}</div>
           <div className="text-sm opacity-90 mt-1">
-            Completion: {analytics?.appointmentStats?.completionRate?.toFixed(1) || 0}%
+            Scheduled: {analytics?.appointments?.scheduled || 0}
           </div>
         </div>
 
@@ -85,9 +104,9 @@ const EnhancedAnalyticsPage = () => {
             <AlertCircle className="h-8 w-8" />
             <span className="text-sm opacity-80">Emergencies</span>
           </div>
-          <div className="text-3xl font-bold">{analytics?.emergencyStats?.totalEmergencies || 0}</div>
+          <div className="text-3xl font-bold">{analytics?.emergencies?.total || 0}</div>
           <div className="text-sm opacity-90 mt-1">
-            Avg Response: {analytics?.emergencyStats?.averageResponseTime?.toFixed(1) || 0}h
+            Active: {analytics?.emergencies?.active || 0}
           </div>
         </div>
       </div>
@@ -188,17 +207,19 @@ const EnhancedAnalyticsPage = () => {
             <AlertCircle className="h-6 w-6" />
             Low Stock Alerts
           </h2>
-          {analytics?.lowStockAlerts && analytics.lowStockAlerts.length > 0 ? (
+          {analytics?.inventory?.lowStockGroups && analytics.inventory.lowStockGroups.length > 0 ? (
             <div className="space-y-2">
-              {analytics.lowStockAlerts.map((alert, idx) => (
-                <div key={idx} className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">{alert._id}</span>
-                    <span className="text-red-600 font-bold">{alert.totalUnits} units</span>
+              {analytics.inventory.byBloodGroup
+                ?.filter(item => analytics.inventory.lowStockGroups.includes(item._id))
+                .map((alert, idx) => (
+                  <div key={idx} className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">{alert._id}</span>
+                      <span className="text-red-600 font-bold">{alert.available} units</span>
+                    </div>
+                    <p className="text-sm text-red-700 mt-1">⚠️ Critical: Below 5 units</p>
                   </div>
-                  <p className="text-sm text-red-700 mt-1">⚠️ Critical: Below 5 units</p>
-                </div>
-              ))}
+                ))}
             </div>
           ) : (
             <p className="text-zinc-500 text-center py-8">No low stock alerts</p>
@@ -211,21 +232,11 @@ const EnhancedAnalyticsPage = () => {
             <Calendar className="h-6 w-6" />
             Expiring Soon (7 Days)
           </h2>
-          {analytics?.expiringUnits && analytics.expiringUnits.length > 0 ? (
-            <div className="space-y-2">
-              {analytics.expiringUnits.map((item, idx) => (
-                <div key={idx} className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="font-medium">{item.Bg_Group}</span>
-                      <span className="text-xs text-zinc-600 ml-2">ID: {item.Bd_Id}</span>
-                    </div>
-                    <span className="text-orange-600 font-bold">
-                      {new Date(item.Bd_Expiry_Date).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-              ))}
+          {analytics?.inventory?.expiringUnits > 0 ? (
+            <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg text-center">
+              <div className="text-3xl font-bold text-orange-600">{analytics.inventory.expiringUnits}</div>
+              <p className="text-sm text-orange-700 mt-2">Units expiring within 7 days</p>
+              <p className="text-xs text-orange-600 mt-1">Action required to prevent wastage</p>
             </div>
           ) : (
             <p className="text-zinc-500 text-center py-8">No units expiring soon</p>

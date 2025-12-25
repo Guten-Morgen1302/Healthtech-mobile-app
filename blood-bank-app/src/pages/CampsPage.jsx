@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { campsAPI } from '../services/api';
 import { Tent, MapPin, Calendar, Users, Plus } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import { useAuth } from '../context/AuthContext';
 
 const CampsPage = () => {
   const { success, error } = useToast();
+  const { user } = useAuth();
   const [camps, setCamps] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -24,13 +26,18 @@ const CampsPage = () => {
   };
 
   const handleRegister = async (campId) => {
+    if (!user) {
+      error('Login Required', 'Please login to register for camps');
+      return;
+    }
+
     try {
       await campsAPI.register(campId, {
-        donorId: 'temp-donor-id',
-        donorName: 'John Doe',
-        donorPhone: '1234567890',
-        donorEmail: 'john@example.com',
-        bloodGroup: 'O+'
+        donorId: user._id,
+        donorName: user.Bd_Name || 'Unknown Donor',
+        donorPhone: user.Bd_Cell_Num || '',
+        donorEmail: user.Bd_Email || '',
+        bloodGroup: user.Bd_Blood_Group || ''
       });
       success('Registered!', 'You have been registered for the camp');
       fetchCamps();
@@ -56,11 +63,10 @@ const CampsPage = () => {
           <div key={camp._id} className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-start justify-between mb-4">
               <h3 className="text-xl font-semibold text-zinc-900">{camp.campName}</h3>
-              <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                camp.status === 'upcoming' ? 'bg-green-100 text-green-700' :
+              <span className={`px-3 py-1 rounded-full text-xs font-medium ${camp.status === 'upcoming' ? 'bg-green-100 text-green-700' :
                 camp.status === 'ongoing' ? 'bg-blue-100 text-blue-700' :
-                'bg-zinc-100 text-zinc-700'
-              }`}>
+                  'bg-zinc-100 text-zinc-700'
+                }`}>
                 {camp.status.toUpperCase()}
               </span>
             </div>

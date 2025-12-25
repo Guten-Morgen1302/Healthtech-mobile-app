@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useHospitalAuth } from '../../context/HospitalAuthContext';
 import { useToast } from '../../context/ToastContext';
 import { hospitalRequestsAPI } from '../../services/api';
-import { 
-  Plus, 
-  Droplets, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
+import {
+  Plus,
+  Droplets,
+  Clock,
+  CheckCircle,
+  XCircle,
   AlertTriangle,
   FileText,
   Loader2,
@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 
 const HospitalRequestsPage = () => {
+  // const { hospital } = useHospitalAuth(); // unused
+  // eslint-disable-next-line no-unused-vars
   const { hospital } = useHospitalAuth();
   const { success, error: showError } = useToast();
   const [requests, setRequests] = useState([]);
@@ -35,16 +37,12 @@ const HospitalRequestsPage = () => {
   const [error, setError] = useState('');
   const [confirmDialog, setConfirmDialog] = useState({ show: false, requestId: null });
 
-  useEffect(() => {
-    fetchRequests();
-  }, [selectedStatus]);
-
   const fetchRequests = async () => {
     try {
       setLoading(true);
       const params = selectedStatus ? { status: selectedStatus } : {};
       const response = await hospitalRequestsAPI.getAll(params);
-      
+
       if (response.data.success) {
         setRequests(response.data.data);
       }
@@ -55,6 +53,11 @@ const HospitalRequestsPage = () => {
     }
   };
 
+  useEffect(() => {
+    fetchRequests();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedStatus]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -62,7 +65,7 @@ const HospitalRequestsPage = () => {
 
     try {
       const response = await hospitalRequestsAPI.create(formData);
-      
+
       if (response.data.success) {
         success('Request created successfully', `Your ${formData.bloodGroup} blood request has been submitted`);
         setShowModal(false);
@@ -104,21 +107,22 @@ const HospitalRequestsPage = () => {
   const handleCancelReject = () => {
     setConfirmDialog({ show: false, requestId: null });
   };
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'pending':
-        return <Clock className="h-5 w-5 text-amber-600" />;
-      case 'approved':
-        return <CheckCircle className="h-5 w-5 text-emerald-600" />;
-      case 'rejected':
-        return <XCircle className="h-5 w-5 text-red-600" />;
-      case 'fulfilled':
-        return <CheckCircle className="h-5 w-5 text-cyan-600" />;
-      default:
-        return <FileText className="h-5 w-5 text-zinc-600" />;
-    }
-  };
+  /*
+    const getStatusIcon = (status) => {
+      switch (status) {
+        case 'pending':
+          return <Clock className="h-5 w-5 text-amber-600" />;
+        case 'approved':
+          return <CheckCircle className="h-5 w-5 text-emerald-600" />;
+        case 'rejected':
+          return <XCircle className="h-5 w-5 text-red-600" />;
+        case 'fulfilled':
+          return <CheckCircle className="h-5 w-5 text-cyan-600" />;
+        default:
+          return <FileText className="h-5 w-5 text-zinc-600" />;
+      }
+    };
+  */
 
   const getStatusColor = (status) => {
     const colors = {
@@ -166,11 +170,10 @@ const HospitalRequestsPage = () => {
             <button
               key={status}
               onClick={() => setSelectedStatus(status)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                selectedStatus === status
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${selectedStatus === status
                   ? 'bg-cyan-600 text-white shadow-sm'
                   : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
-              }`}
+                }`}
             >
               {status === '' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1)}
             </button>
@@ -216,9 +219,8 @@ const HospitalRequestsPage = () => {
                           {request.status}
                         </span>
                         {request.urgency !== 'routine' && (
-                          <span className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${
-                            request.urgency === 'emergency' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
-                          }`}>
+                          <span className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${request.urgency === 'emergency' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
+                            }`}>
                             {getUrgencyIcon(request.urgency)}
                             {request.urgency}
                           </span>
@@ -289,7 +291,7 @@ const HospitalRequestsPage = () => {
           <div className="bg-white/95 backdrop-blur-xl rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl border border-white/20 my-8">
             <div className="px-4 sm:px-6 py-4 border-b border-zinc-200/50 flex items-center justify-between">
               <h2 className="text-lg sm:text-xl font-semibold text-zinc-900">Create Blood Request</h2>
-              <button 
+              <button
                 onClick={() => setShowModal(false)}
                 className="text-zinc-400 hover:text-zinc-600 p-1 rounded-lg hover:bg-white/50 transition-colors"
               >

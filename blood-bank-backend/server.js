@@ -18,10 +18,15 @@ const corsOptions = {
       'http://localhost:5173',
       'https://bbmanagement.netlify.app'
     ];
-    
+
     // Allow requests with no origin (like mobile apps or Postman)
     if (!origin) return callback(null, true);
-    
+
+    // In development, allow all origins to prevent headaches
+    if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
+      return callback(null, true);
+    }
+
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {

@@ -1,98 +1,88 @@
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
 
-// Blood Group Code Mapping for eRaktKosh API
-const BLOOD_GROUP_CODES = {
-  'A+': 11,
-  'A-': 12,
-  'B+': 13,
-  'B-': 14,
-  'O+': 15,
-  'O-': 16,
-  'AB+': 17,
-  'AB-': 18
+// Mock Data Source
+const MOCK_BLOOD_BANKS = {
+  'O+': [
+    { id: 1, hospitalName: 'Tata Memorial Hospital Blood Bank', distance: 2.3, address: 'Dr. E Borges Road, Parel, Mumbai - 400012', contact: '022-24177000', component: 'Whole Blood', stock: '45 Units', city: 'Mumbai', state: 'Maharashtra', latitude: 19.0185, longitude: 72.8436 },
+    { id: 2, hospitalName: 'KEM Hospital Blood Bank', distance: 3.1, address: 'Acharya Donde Marg, Parel, Mumbai - 400012', contact: '022-24136051', component: 'Whole Blood', stock: '32 Units', city: 'Mumbai', state: 'Maharashtra', latitude: 19.0028, longitude: 72.8399 },
+    { id: 3, hospitalName: 'JJ Hospital Blood Bank', distance: 4.5, address: 'J.J. Marg, Nagpada, Mumbai - 400008', contact: '022-23739600', component: 'Packed RBC', stock: '28 Units', city: 'Mumbai', state: 'Maharashtra', latitude: 18.9616, longitude: 72.8329 },
+    { id: 4, hospitalName: 'Lilavati Hospital Blood Bank', distance: 5.2, address: 'A-791, Bandra Reclamation, Mumbai - 400050', contact: '022-26751000', component: 'Whole Blood', stock: '52 Units', city: 'Mumbai', state: 'Maharashtra', latitude: 19.0511, longitude: 72.8258 },
+  ],
+  'A+': [
+    { id: 1, hospitalName: 'AIIMS Blood Bank', distance: 1.8, address: 'Sri Aurobindo Marg, Ansari Nagar, New Delhi - 110029', contact: '011-26588500', component: 'Whole Blood', stock: '67 Units', city: 'New Delhi', state: 'Delhi', latitude: 28.5670, longitude: 77.2100 },
+    { id: 2, hospitalName: 'Safdarjung Hospital Blood Bank', distance: 2.5, address: 'Ring Road, Safdarjung Enclave, New Delhi - 110029', contact: '011-26730000', component: 'Packed RBC', stock: '38 Units', city: 'New Delhi', state: 'Delhi', latitude: 28.5684, longitude: 77.1906 },
+    { id: 3, hospitalName: 'Apollo Hospital Blood Bank', distance: 4.2, address: 'Sarita Vihar, Mathura Road, New Delhi - 110076', contact: '011-29871000', component: 'Whole Blood', stock: '54 Units', city: 'New Delhi', state: 'Delhi', latitude: 28.5369, longitude: 77.2917 },
+  ],
+  'B+': [
+    { id: 1, hospitalName: 'CMC Vellore Blood Bank', distance: 0.8, address: 'Ida Scudder Road, Vellore - 632004', contact: '0416-2281000', component: 'Whole Blood', stock: '89 Units', city: 'Vellore', state: 'Tamil Nadu', latitude: 12.9272, longitude: 79.1325 },
+    { id: 2, hospitalName: 'Apollo Hospitals Blood Bank', distance: 3.4, address: 'Greams Lane, Chennai - 600006', contact: '044-28293333', component: 'Packed RBC', stock: '56 Units', city: 'Chennai', state: 'Tamil Nadu', latitude: 13.0645, longitude: 80.2520 },
+  ],
+  'AB+': [
+    { id: 1, hospitalName: 'Manipal Hospital Blood Bank', distance: 2.1, address: '98, HAL Old Airport Road, Bangalore - 560017', contact: '080-25024444', component: 'Whole Blood', stock: '24 Units', city: 'Bangalore', state: 'Karnataka', latitude: 12.9602, longitude: 77.6433 },
+    { id: 2, hospitalName: 'Narayana Hrudayalaya', distance: 5.3, address: '258/A, Bommasandra, Bangalore - 560099', contact: '080-71222222', component: 'Platelets', stock: '15 Units', city: 'Bangalore', state: 'Karnataka', latitude: 12.8093, longitude: 77.6975 },
+  ],
+  'O-': [
+    { id: 1, hospitalName: 'Ruby Hall Clinic Blood Bank', distance: 1.5, address: '40, Sassoon Road, Pune - 411001', contact: '020-66455000', component: 'Whole Blood', stock: '12 Units', city: 'Pune', state: 'Maharashtra', latitude: 18.5297, longitude: 73.8760 },
+    { id: 2, hospitalName: 'Jehangir Hospital Blood Bank', distance: 3.2, address: '32, Sassoon Road, Pune - 411001', contact: '020-66815555', component: 'Packed RBC', stock: '8 Units', city: 'Pune', state: 'Maharashtra', latitude: 18.5293, longitude: 73.8732 },
+  ],
+  'A-': [
+    { id: 1, hospitalName: 'PGI Chandigarh Blood Bank', distance: 1.2, address: 'Sector 12, Chandigarh - 160012', contact: '0172-2747585', component: 'Whole Blood', stock: '18 Units', city: 'Chandigarh', state: 'Chandigarh', latitude: 30.7634, longitude: 76.7796 },
+    { id: 2, hospitalName: 'Max Hospital Blood Bank', distance: 4.5, address: 'Phase 6, Mohali - 160055', contact: '0172-6652000', component: 'FFP', stock: '11 Units', city: 'Mohali', state: 'Punjab', latitude: 30.7311, longitude: 76.7214 },
+  ],
+  'B-': [
+    { id: 1, hospitalName: 'KGMU Blood Bank', distance: 2.4, address: 'Shah Mina Road, Lucknow - 226003', contact: '0522-2258181', component: 'Whole Blood', stock: '9 Units', city: 'Lucknow', state: 'Uttar Pradesh', latitude: 26.8679, longitude: 80.9138 },
+  ],
+  'AB-': [
+    { id: 1, hospitalName: 'NIMHANS Blood Bank', distance: 3.6, address: 'Hosur Road, Bangalore - 560029', contact: '080-26995000', component: 'Whole Blood', stock: '5 Units', city: 'Bangalore', state: 'Karnataka', latitude: 12.9365, longitude: 77.5956 },
+  ]
 };
+
+const MOCK_FACILITIES = [
+  { id: 1, facilityId: 'FAC001', name: 'Apollo Hospitals', address: 'Greams Lane, Off Greams Road', city: 'Chennai', state: 'Tamil Nadu', pincode: '600006', contact: '044-28293333', email: 'info@apollohospitals.com', latitude: 13.0569, longitude: 80.2425, distance: 2.5, facilityType: 'Multi-Specialty Hospital' },
+  { id: 2, facilityId: 'FAC002', name: 'Fortis Healthcare', address: 'Sector 62, Phase VIII', city: 'Mohali', state: 'Punjab', pincode: '160062', contact: '0172-5096000', email: 'info@fortishealthcare.com', latitude: 30.7046, longitude: 76.7179, distance: 1.8, facilityType: 'Multi-Specialty Hospital' },
+  { id: 3, facilityId: 'FAC003', name: 'Max Super Speciality Hospital', address: 'Press Enclave Road', city: 'Saket, New Delhi', state: 'Delhi', pincode: '110017', contact: '011-26515050', email: 'info@maxhealthcare.com', latitude: 28.5244, longitude: 77.2067, distance: 3.2, facilityType: 'Super Specialty Hospital' },
+  { id: 4, facilityId: 'FAC004', name: 'Manipal Hospital', address: '98, Rustom Bagh', city: 'Bangalore', state: 'Karnataka', pincode: '560017', contact: '080-25024444', email: 'info@manipalhospitals.com', latitude: 12.9698, longitude: 77.6489, distance: 4.1, facilityType: 'Multi-Specialty Hospital' },
+  { id: 5, facilityId: 'FAC005', name: 'Medanta - The Medicity', address: 'Sector 38', city: 'Gurugram', state: 'Haryana', pincode: '122001', contact: '0124-4141414', email: 'info@medanta.org', latitude: 28.4353, longitude: 77.0535, distance: 5.5, facilityType: 'Multi-Specialty Hospital' },
+  { id: 6, facilityId: 'FAC006', name: 'Narayana Health', address: '258/A, Bommasandra Industrial Area', city: 'Bangalore', state: 'Karnataka', pincode: '560099', contact: '080-71222222', email: 'info@narayanahealth.org', latitude: 12.8050, longitude: 77.6869, distance: 6.8, facilityType: 'Cardiac Care Hospital' },
+  { id: 7, facilityId: 'FAC007', name: 'Kokilaben Dhirubhai Ambani Hospital', address: 'Four Bungalows, Andheri West', city: 'Mumbai', state: 'Maharashtra', pincode: '400053', contact: '022-30999999', email: 'info@kokilabenhospital.com', latitude: 19.1266, longitude: 72.8304, distance: 3.7, facilityType: 'Multi-Specialty Hospital' },
+  { id: 8, facilityId: 'FAC008', name: 'Breach Candy Hospital', address: '60-A, Bhulabhai Desai Road', city: 'Mumbai', state: 'Maharashtra', pincode: '400026', contact: '022-23667788', email: 'info@breachcandyhospital.org', latitude: 18.9732, longitude: 72.8008, distance: 2.9, facilityType: 'General Hospital' },
+];
 
 /**
  * GET /api/eraktkosh/nearby-blood-stock
- * Fetch nearby blood bank stock from eRaktKosh API
- * Query params: lat, long, bg (blood group like A+, O-, etc.)
+ * Fetch mock nearby blood bank stock
  */
-router.get('/nearby-blood-stock', async (req, res) => {
+router.get('/nearby-blood-stock', (req, res) => {
   try {
     const { lat, long, bg } = req.query;
 
-    console.log('Blood Stock Request:', { lat, long, bg, rawQuery: req.url });
+    // Simulate delay
+    setTimeout(() => {
+      // Normalize blood group
+      const normalizedBg = bg ? bg.replace(/\s+/g, '+').toUpperCase() : 'O+';
 
-    if (!lat || !long || !bg) {
-      return res.status(400).json({
-        success: false,
-        message: 'Missing required parameters: lat, long, bg',
-        received: { lat, long, bg }
+      const results = MOCK_BLOOD_BANKS[normalizedBg] || MOCK_BLOOD_BANKS['O+'];
+
+      // Randomize slightly for dynamic feel
+      const normalizedData = results.map(bank => ({
+        ...bank,
+        stock: `${Math.max(1, parseInt(bank.stock) + Math.floor(Math.random() * 10 - 5))} Units`
+      }));
+
+      res.json({
+        success: true,
+        count: normalizedData.length,
+        data: normalizedData,
+        source: 'Mock Data'
       });
-    }
-
-    // Normalize blood group (handle space that might come from decoded +)
-    const normalizedBg = bg.replace(/\s+/g, '+').toUpperCase();
-    const bgCode = BLOOD_GROUP_CODES[normalizedBg];
-    
-    if (!bgCode) {
-      return res.status(400).json({
-        success: false,
-        message: `Invalid blood group: ${bg} (normalized: ${normalizedBg}). Valid options: ${Object.keys(BLOOD_GROUP_CODES).join(', ')}`,
-        received: { original: bg, normalized: normalizedBg }
-      });
-    }
-
-    const url = `https://www.eraktkosh.in/BLDAHIMS/bloodbank/nearbyBB.cnt?hmode=GETNEARBYSTOCK&lat=${lat}&long=${long}&bg=${bgCode}`;
-
-    const response = await axios.get(url, {
-      headers: {
-        'Accept': 'application/json, text/plain, */*',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-      }
-    });
-
-    // Parse and normalize the response
-    let bloodBanks = [];
-    const data = response.data;
-
-    if (Array.isArray(data)) {
-      bloodBanks = data;
-    } else if (typeof data === 'object') {
-      for (const key of ['data', 'result', 'bloodBanks', 'records', 'nearbyBB']) {
-        if (data[key] && Array.isArray(data[key])) {
-          bloodBanks = data[key];
-          break;
-        }
-      }
-    }
-
-    const normalizedData = bloodBanks.map((bb, index) => ({
-      id: bb.id || index + 1,
-      hospitalName: bb.hospitalName || bb.bbName || bb.name || bb.bloodBankName || 'Unknown Hospital',
-      distance: bb.distance || bb.dist || bb.distanceKm || null,
-      address: bb.address || bb.addr || bb.location || 'Address not available',
-      contact: bb.contactNo || bb.contact || bb.phone || bb.mobile || 'N/A',
-      component: bb.componentName || bb.bloodComponent || bb.component || 'Whole Blood',
-      stock: bb.stock || bb.quantity || bb.units || bb.availableUnits || 'Available',
-      latitude: bb.lat || bb.latitude || null,
-      longitude: bb.lng || bb.long || bb.longitude || null
-    }));
-
-    res.json({
-      success: true,
-      count: normalizedData.length,
-      data: normalizedData
-    });
+    }, 500);
 
   } catch (error) {
-    console.error('eRaktKosh API Error:', error.message);
+    console.error('Mock eRaktKosh Error:', error.message);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch blood stock data',
+      message: 'Failed to fetch mock data',
       error: error.message
     });
   }
@@ -100,107 +90,27 @@ router.get('/nearby-blood-stock', async (req, res) => {
 
 /**
  * GET /api/eraktkosh/nearby-facilities
- * Fetch nearby healthcare facilities from ABDM Facility Sandbox API
- * Query params: lat, long, radius (optional)
+ * Fetch mock nearby healthcare facilities
  */
-router.get('/nearby-facilities', async (req, res) => {
+router.get('/nearby-facilities', (req, res) => {
   try {
     const { lat, long, radius = 10 } = req.query;
 
-    if (!lat || !long) {
-      return res.status(400).json({
-        success: false,
-        message: 'Missing required parameters: lat, long'
+    setTimeout(() => {
+      res.json({
+        success: true,
+        count: MOCK_FACILITIES.length,
+        data: MOCK_FACILITIES,
+        source: 'Mock Data'
       });
-    }
-
-    // ABDM Facility Sandbox API - try different endpoints
-    const abdmBaseUrl = 'https://facilitysbx.abdm.gov.in';
-    
-    // Try the facilities search endpoint
-    let response;
-    try {
-      response = await axios.get(`${abdmBaseUrl}/api/v1/facility/search`, {
-        params: {
-          latitude: parseFloat(lat),
-          longitude: parseFloat(long),
-          radius: parseFloat(radius)
-        },
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        },
-        timeout: 10000
-      });
-    } catch (err) {
-      // If that fails, try alternate endpoint structure
-      response = await axios.post(`${abdmBaseUrl}/api/facility/nearby`, {
-        latitude: parseFloat(lat),
-        longitude: parseFloat(long),
-        radius: parseFloat(radius)
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        },
-        timeout: 10000
-      });
-    }
-
-    // Parse and normalize the facilities response
-    let facilities = [];
-    const data = response.data;
-
-    if (Array.isArray(data)) {
-      facilities = data;
-    } else if (typeof data === 'object') {
-      // Check for various possible response structures
-      for (const key of ['facilities', 'data', 'hospitals', 'healthcareFacilities', 'result', 'items']) {
-        if (data[key] && Array.isArray(data[key])) {
-          facilities = data[key];
-          break;
-        }
-      }
-      // If still empty, check if data itself has facility properties
-      if (facilities.length === 0 && data.facilityId) {
-        facilities = [data];
-      }
-    }
-
-    const normalizedFacilities = facilities.map((facility, index) => ({
-      id: facility.facilityId || facility.id || facility.hipId || index + 1,
-      name: facility.facilityName || facility.name || facility.hospitalName || facility.providerName || 'Unknown Facility',
-      address: facility.address || facility.addressLine || facility.addr || 'Address not available',
-      city: facility.city || facility.cityName || facility.district || 'N/A',
-      state: facility.state || facility.stateName || 'N/A',
-      pincode: facility.pincode || facility.postalCode || facility.pin || 'N/A',
-      contact: facility.phone || facility.contactNo || facility.contact || facility.mobile || 'N/A',
-      email: facility.email || facility.emailId || 'N/A',
-      latitude: facility.latitude || facility.lat || null,
-      longitude: facility.longitude || facility.lng || facility.long || null,
-      distance: facility.distance || null,
-      facilityType: facility.facilityType || facility.type || facility.category || 'Healthcare Facility',
-      bloodComponents: facility.bloodComponents || facility.services || []
-    }));
-
-    res.json({
-      success: true,
-      count: normalizedFacilities.length,
-      data: normalizedFacilities,
-      source: 'ABDM Facility Sandbox'
-    });
+    }, 500);
 
   } catch (error) {
-    console.error('ABDM Facility Search Error:', error.message);
-    
-    // If ABDM fails, provide helpful error message
+    console.error('Mock Facilities Error:', error.message);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch nearby facilities from ABDM',
-      error: error.message,
-      tip: 'The ABDM Facility Sandbox API may require authentication or have connectivity issues. Check API documentation at https://facilitysbx.abdm.gov.in/v2/api-docs'
+      message: 'Failed to fetch mock facilities',
+      error: error.message
     });
   }
 });

@@ -4,7 +4,7 @@
  */
 
 // Backend API base URL
-const BACKEND_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// const BACKEND_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 // Mock blood bank data
 const MOCK_BLOOD_BANKS = {
@@ -67,7 +67,7 @@ export const fetchNearbyBloodStock = async (latitude, longitude, bloodGroup) => 
   await new Promise(resolve => setTimeout(resolve, 800));
 
   const results = MOCK_BLOOD_BANKS[bloodGroup] || [];
-  
+
   // Add slight randomization to make it feel dynamic
   return results.map(bank => ({
     ...bank,

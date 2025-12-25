@@ -290,7 +290,7 @@ node seedHospitalCredentials.js
 ## 📽️ Demo Video
 
 <div align="center">
-  <a href="#" target="_blank">
+  <a href="https://drive.google.com/file/d/1M70fuFne4rrvDiAGySRf_rH1ukzX8Reg/view?usp=drive_link" target="_blank">
     <img src="https://img.shields.io/badge/▶️-Watch_Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch Demo">
   </a>
 </div>
@@ -359,7 +359,7 @@ node seedHospitalCredentials.js
       <td align="center">
         <h3>🧑‍💻 Harsh Patil</h3>
         <p>Full Stack Developer</p>
-        <a href="https://linkedin.com/in/harsh-patil" target="_blank">
+        <a href="https://www.linkedin.com/in/harshpatil13" target="_blank">
           <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
         </a>
       </td>

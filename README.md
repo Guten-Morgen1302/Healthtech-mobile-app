@@ -271,16 +271,16 @@ node seedHospitalCredentials.js
       <td><b>🩸 Blood Inventory</b></td>
     </tr>
     <tr>
-      <td><img src="https://via.placeholder.com/400x300/DC143C/FFFFFF?text=Dashboard+View" alt="Dashboard"></td>
-      <td><img src="https://via.placeholder.com/400x300/8B0000/FFFFFF?text=Blood+Inventory" alt="Inventory"></td>
+      <td><img src="Dashboard.png" alt="Dashboard"></td>
+      <td><img src="Blood_Inventory.png" alt="Inventory"></td>
     </tr>
     <tr>
       <td><b>🤝 Donor Management</b></td>
       <td><b>🏥 Hospital Network</b></td>
     </tr>
     <tr>
-      <td><img src="https://via.placeholder.com/400x300/B22222/FFFFFF?text=Donor+Portal" alt="Donors"></td>
-      <td><img src="https://via.placeholder.com/400x300/DC143C/FFFFFF?text=Hospital+Dashboard" alt="Hospitals"></td>
+      <td><img src="Donors.png" alt="Donors"></td>
+      <td><img src="Hospital_Network.png" alt="Hospitals"></td>
     </tr>
   </table>
 </div>
@@ -352,13 +352,13 @@ node seedHospitalCredentials.js
       <td align="center">
         <h3>🧑‍💻 Deep Mehta</h3>
         <p>Full Stack Developer</p>
-        <a href="https://linkedin.com/in/deep-mehta" target="_blank">
+        <a href="https://www.linkedin.com/in/deep-mehta-857a09304/" target="_blank">
           <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
         </a>
       </td>
       <td align="center">
         <h3>🧑‍💻 Harsh Patil</h3>
-        <p>Frontend Developer</p>
+        <p>Full Stack Developer</p>
         <a href="https://linkedin.com/in/harsh-patil" target="_blank">
           <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
         </a>
@@ -367,15 +367,15 @@ node seedHospitalCredentials.js
     <tr>
       <td align="center">
         <h3>🧑‍💻 Abhishek Chaudhari</h3>
-        <p>Frontend Developer</p>
-        <a href="https://linkedin.com/in/abhishek-chaudhari" target="_blank">
+        <p>Full Stack Developer</p>
+        <a href="https://www.linkedin.com/in/abhishek-chaudhari-949002356" target="_blank">
           <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
         </a>
       </td>
       <td align="center">
         <h3>🧑‍💻 Nachiket Kale</h3>
         <p>Team Leader</p>
-        <a href="https://linkedin.com/in/nachiket-kale" target="_blank">
+        <a href="https://www.linkedin.com/in/nachiket-kale-5363001b3" target="_blank">
           <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
         </a>
       </td>

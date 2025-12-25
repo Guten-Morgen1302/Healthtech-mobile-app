@@ -1,6 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { rewardsAPI } from '../services/api';
-import { Trophy, Star, Award, TrendingUp, Users, Heart } from 'lucide-react';
+import { Trophy, Star, Award, TrendingUp, Users, Heart, Droplet, Shield, Zap, Medal, Crown, Gift } from 'lucide-react';
+
+// Badge icon mapping
+const BADGE_ICONS = {
+  'First Donation': Droplet,
+  'Life Saver': Heart,
+  'Emergency Hero': Zap,
+  'Regular Donor': Medal,
+  'Champion': Crown,
+  'Volunteer': Gift,
+  'default': Award
+};
+
+const getBadgeIcon = (iconName) => {
+  return BADGE_ICONS[iconName] || BADGE_ICONS['default'];
+};
 
 const RewardsPage = () => {
   const [rewards, setRewards] = useState(null);
@@ -33,7 +48,12 @@ const RewardsPage = () => {
   const fetchLeaderboard = async () => {
     try {
       const response = await rewardsAPI.getLeaderboard({ limit: 10 });
-      setLeaderboard(response.data.data || []);
+      const data = response.data.data || [];
+      setLeaderboard(data);
+      // Use top donor's stats for display when no user is logged in
+      if (!donorId && data.length > 0) {
+        setRewards(data[0]);
+      }
     } catch (err) {
       console.error('Error fetching leaderboard:', err);
     }
@@ -52,7 +72,7 @@ const RewardsPage = () => {
 
   if (loading) return <div className="flex items-center justify-center min-h-screen">
     <div className="text-center"><div className="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-    <p>Loading rewards...</p></div></div>;
+      <p>Loading rewards...</p></div></div>;
 
   return (
     <div className="p-6">
@@ -101,13 +121,24 @@ const RewardsPage = () => {
             My Badges
           </h2>
           <div className="grid grid-cols-3 gap-4">
-            {rewards?.badges && rewards.badges.length > 0 ? rewards.badges.map((badge, idx) => (
-              <div key={idx} className="text-center p-4 bg-zinc-50 rounded-lg">
-                <div className="text-4xl mb-2">{badge.icon || '🏅'}</div>
-                <div className="text-sm font-medium">{badge.name}</div>
-                <div className="text-xs text-zinc-600 capitalize">{badge.level}</div>
-              </div>
-            )) : (
+            {rewards?.badges && rewards.badges.length > 0 ? rewards.badges.map((badge, idx) => {
+              const IconComponent = getBadgeIcon(badge.name);
+              const levelColors = {
+                bronze: 'text-orange-600 bg-orange-100',
+                silver: 'text-zinc-500 bg-zinc-100',
+                gold: 'text-yellow-600 bg-yellow-100',
+                platinum: 'text-purple-600 bg-purple-100'
+              };
+              return (
+                <div key={idx} className="text-center p-4 bg-zinc-50 rounded-lg hover:bg-zinc-100 transition-colors">
+                  <div className={`w-14 h-14 mx-auto mb-2 rounded-full flex items-center justify-center ${levelColors[badge.level] || 'text-blue-600 bg-blue-100'}`}>
+                    <IconComponent className="h-7 w-7" />
+                  </div>
+                  <div className="text-sm font-medium text-zinc-800">{badge.name}</div>
+                  <div className="text-xs text-zinc-500 capitalize">{badge.level}</div>
+                </div>
+              );
+            }) : (
               <div className="col-span-3 text-center text-zinc-500 py-4">No badges yet. Start donating!</div>
             )}
           </div>
@@ -123,9 +154,8 @@ const RewardsPage = () => {
             {leaderboard.map((donor, idx) => (
               <div key={donor._id} className="flex items-center justify-between p-3 bg-zinc-50 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white ${
-                    idx === 0 ? 'bg-yellow-500' : idx === 1 ? 'bg-zinc-400' : idx === 2 ? 'bg-orange-600' : 'bg-zinc-300'
-                  }`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white ${idx === 0 ? 'bg-yellow-500' : idx === 1 ? 'bg-zinc-400' : idx === 2 ? 'bg-orange-600' : 'bg-zinc-300'
+                    }`}>
                     {idx + 1}
                   </div>
                   <div>

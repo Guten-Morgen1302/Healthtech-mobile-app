@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 // Animated counter hook
 const useCounter = (end, duration = 2000) => {
   const [count, setCount] = useState(0);
-  
+
   useEffect(() => {
     let startTime;
     const animate = (currentTime) => {
@@ -15,13 +15,13 @@ const useCounter = (end, duration = 2000) => {
     };
     requestAnimationFrame(animate);
   }, [end, duration]);
-  
+
   return count;
 };
 
 // Floating animation component
 const FloatingElement = ({ children, delay = 0, className = '' }) => (
-  <div 
+  <div
     className={`animate-float ${className}`}
     style={{ animationDelay: `${delay}s` }}
   >
@@ -32,7 +32,7 @@ const FloatingElement = ({ children, delay = 0, className = '' }) => (
 // Glassmorphic Card Component
 const GlassCard = ({ children, className = '', hover3D = true }) => {
   const [transform, setTransform] = useState('');
-  
+
   const handleMouseMove = (e) => {
     if (!hover3D) return;
     const rect = e.currentTarget.getBoundingClientRect();
@@ -44,11 +44,11 @@ const GlassCard = ({ children, className = '', hover3D = true }) => {
     const rotateY = (centerX - x) / 20;
     setTransform(`perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`);
   };
-  
+
   const handleMouseLeave = () => {
     setTransform('perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)');
   };
-  
+
   return (
     <div
       className={`glass-card ${className}`}
@@ -167,7 +167,7 @@ const LandingPage = () => {
   const livesSaved = useCounter(25000, 2500);
   const bloodUnitsCollected = useCounter(150000, 2500);
   const hospitalPartners = useCounter(350, 2000);
-  
+
   useEffect(() => {
     setIsVisible(true);
   }, []);
@@ -180,7 +180,7 @@ const LandingPage = () => {
         <div className="absolute top-40 right-20 w-96 h-96 bg-cyan-300/20 rounded-full blur-3xl animate-float" />
         <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-teal-300/15 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: '1s' }} />
         <div className="absolute -bottom-20 right-10 w-64 h-64 bg-emerald-300/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
-        
+
         {/* Abstract medical shapes */}
         <svg className="absolute top-1/4 right-1/4 w-32 h-32 text-white/10 animate-spin-slow" viewBox="0 0 100 100">
           <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="10 5" />
@@ -196,26 +196,26 @@ const LandingPage = () => {
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-white/30 to-white/10 backdrop-blur-lg flex items-center justify-center border border-white/20 shadow-lg">
               <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C12 2 4 8.5 4 13.5C4 17.64 7.58 21 12 21C16.42 21 20 17.64 20 13.5C20 8.5 12 2 12 2ZM12 19C8.69 19 6 16.54 6 13.5C6 10.5 9 6.5 12 4C15 6.5 18 10.5 18 13.5C18 16.54 15.31 19 12 19ZM12 16C10.34 16 9 14.66 9 13C9 11.34 10.34 10 12 10C13.66 10 15 11.34 15 13C15 14.66 13.66 16 12 16Z"/>
+                <path d="M12 2C12 2 4 8.5 4 13.5C4 17.64 7.58 21 12 21C16.42 21 20 17.64 20 13.5C20 8.5 12 2 12 2ZM12 19C8.69 19 6 16.54 6 13.5C6 10.5 9 6.5 12 4C15 6.5 18 10.5 18 13.5C18 16.54 15.31 19 12 19ZM12 16C10.34 16 9 14.66 9 13C9 11.34 10.34 10 12 10C13.66 10 15 11.34 15 13C15 14.66 13.66 16 12 16Z" />
               </svg>
             </div>
             <span className="text-2xl font-bold text-white tracking-tight">BloodLink</span>
           </div>
-          
+
           <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-white/80 hover:text-white transition-colors font-medium">Features</a>
             <a href="#dashboard" className="text-white/80 hover:text-white transition-colors font-medium">Dashboard</a>
             <a href="#privacy" className="text-white/80 hover:text-white transition-colors font-medium">Privacy</a>
           </div>
-          
+
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={() => navigate('/login')}
               className="px-6 py-2.5 text-white/90 hover:text-white font-medium transition-all hover:bg-white/10 rounded-xl"
             >
               Sign In
             </button>
-            <button 
+            <button
               onClick={() => navigate('/login')}
               className="btn-glow px-6 py-2.5 bg-white text-teal-600 font-semibold rounded-xl hover:shadow-2xl hover:shadow-white/25 transition-all duration-300 hover:-translate-y-0.5"
             >
@@ -235,21 +235,21 @@ const LandingPage = () => {
                 <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
                 <span className="text-white/90 text-sm font-medium">Saving 25,000+ lives through blood donation</span>
               </div>
-              
+
               <h1 className="text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight">
                 Smart Blood Bank{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 via-white to-teal-200 animate-gradient-text">
                   Management
                 </span>
               </h1>
-              
+
               <p className="text-xl text-white/80 mb-10 max-w-xl leading-relaxed">
-                Revolutionize blood donation with real-time inventory tracking, 
+                Revolutionize blood donation with real-time inventory tracking,
                 seamless hospital coordination, and life-saving emergency response—all in one powerful platform.
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <button 
+                <button
                   onClick={() => navigate('/login')}
                   className="group relative px-8 py-4 bg-white text-teal-600 font-bold text-lg rounded-2xl shadow-2xl shadow-white/25 hover:shadow-white/40 transition-all duration-300 hover:-translate-y-1 hover:scale-105 overflow-hidden"
                 >
@@ -261,17 +261,17 @@ const LandingPage = () => {
                   </span>
                   <div className="absolute inset-0 bg-gradient-to-r from-cyan-100 to-teal-100 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </button>
-                
+
                 <button className="group px-8 py-4 bg-white/10 backdrop-blur-lg text-white font-bold text-lg rounded-2xl border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all duration-300 hover:-translate-y-1 flex items-center justify-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <svg className="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z"/>
+                      <path d="M8 5v14l11-7z" />
                     </svg>
                   </div>
                   Watch Demo
                 </button>
               </div>
-              
+
               {/* Stats */}
               <div className="grid grid-cols-3 gap-8 mt-16">
                 <div className="text-center lg:text-left">
@@ -288,7 +288,7 @@ const LandingPage = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Right - 3D Card Preview */}
             <div className="relative">
               <FloatingElement delay={0}>
@@ -302,13 +302,13 @@ const LandingPage = () => {
                       <p className="text-gray-500 text-sm">Real-time stock status</p>
                     </div>
                   </div>
-                  
+
                   <div className="relative h-40 flex items-center justify-center">
                     <svg className="w-36 h-36 transform -rotate-90">
                       <circle cx="72" cy="72" r="64" fill="none" stroke="#e5e7eb" strokeWidth="12" />
-                      <circle 
-                        cx="72" cy="72" r="64" fill="none" 
-                        stroke="url(#gradient)" strokeWidth="12" 
+                      <circle
+                        cx="72" cy="72" r="64" fill="none"
+                        stroke="url(#gradient)" strokeWidth="12"
                         strokeLinecap="round"
                         strokeDasharray="402"
                         strokeDashoffset="80"
@@ -326,7 +326,7 @@ const LandingPage = () => {
                       <span className="text-sm text-gray-500">Stock Level</span>
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-3 gap-4 mt-6">
                     <div className="text-center p-3 bg-red-50 rounded-xl">
                       <div className="text-lg font-bold text-red-600">245</div>
@@ -343,7 +343,7 @@ const LandingPage = () => {
                   </div>
                 </GlassCard>
               </FloatingElement>
-              
+
               {/* Floating mini cards */}
               <FloatingElement delay={0.5} className="absolute -top-4 -right-4 lg:right-0">
                 <div className="glass-card-mini px-4 py-3 flex items-center gap-3">
@@ -358,12 +358,12 @@ const LandingPage = () => {
                   </div>
                 </div>
               </FloatingElement>
-              
+
               <FloatingElement delay={1} className="absolute -bottom-4 -left-4 lg:left-0">
                 <div className="glass-card-mini px-4 py-3 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-400 to-red-500 flex items-center justify-center">
                     <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C12 2 4 8.5 4 13.5C4 17.64 7.58 21 12 21C16.42 21 20 17.64 20 13.5C20 8.5 12 2 12 2Z"/>
+                      <path d="M12 2C12 2 4 8.5 4 13.5C4 17.64 7.58 21 12 21C16.42 21 20 17.64 20 13.5C20 8.5 12 2 12 2Z" />
                     </svg>
                   </div>
                   <div>
@@ -391,7 +391,7 @@ const LandingPage = () => {
               Comprehensive tools designed to streamline blood bank operations and connect donors with those in need.
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <GlassCard key={index} className="p-8 group cursor-pointer">
@@ -430,7 +430,7 @@ const LandingPage = () => {
               A powerful dashboard that puts inventory, donations, and emergency requests front and center.
             </p>
           </div>
-          
+
           <GlassCard className="p-8 lg:p-12">
             <div className="grid lg:grid-cols-3 gap-8">
               {/* Vitals Column */}
@@ -441,7 +441,7 @@ const LandingPage = () => {
                   </div>
                   Blood Inventory
                 </h3>
-                
+
                 <div className="grid sm:grid-cols-2 gap-4">
                   {bloodStats.map((stat, index) => (
                     <div key={index} className="bg-gray-50 rounded-2xl p-5 hover:bg-white hover:shadow-lg transition-all duration-300 group">
@@ -458,7 +458,7 @@ const LandingPage = () => {
                     </div>
                   ))}
                 </div>
-                
+
                 {/* Mini Chart */}
                 <div className="mt-8 bg-gradient-to-br from-red-50 to-rose-50 rounded-2xl p-6">
                   <div className="flex justify-between items-center mb-4">
@@ -471,7 +471,7 @@ const LandingPage = () => {
                   <div className="flex items-end justify-between h-32 gap-2">
                     {[65, 40, 80, 55, 90, 70, 85].map((height, i) => (
                       <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                        <div 
+                        <div
                           className="w-full bg-gradient-to-t from-teal-500 to-cyan-400 rounded-lg transition-all duration-500 hover:from-teal-400 hover:to-cyan-300"
                           style={{ height: `${height}%` }}
                         />
@@ -483,7 +483,7 @@ const LandingPage = () => {
                   </div>
                 </div>
               </div>
-              
+
               {/* Reminders Column */}
               <div>
                 <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
@@ -492,24 +492,22 @@ const LandingPage = () => {
                   </div>
                   Today's Schedule
                 </h3>
-                
+
                 <div className="space-y-4">
                   {upcomingActivities.map((activity, index) => (
-                    <div 
-                      key={index} 
-                      className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-                        activity.status === 'completed' 
-                          ? 'bg-emerald-50 border-emerald-200' 
-                          : 'bg-white border-gray-100 hover:border-teal-200 hover:shadow-md'
-                      }`}
+                    <div
+                      key={index}
+                      className={`p-4 rounded-xl border-2 transition-all duration-300 ${activity.status === 'completed'
+                        ? 'bg-emerald-50 border-emerald-200'
+                        : 'bg-white border-gray-100 hover:border-teal-200 hover:shadow-md'
+                        }`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                            activity.status === 'completed' 
-                              ? 'bg-emerald-500' 
-                              : 'bg-gray-100'
-                          }`}>
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${activity.status === 'completed'
+                            ? 'bg-emerald-500'
+                            : 'bg-gray-100'
+                            }`}>
                             {activity.status === 'completed' ? (
                               <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -531,7 +529,7 @@ const LandingPage = () => {
                     </div>
                   ))}
                 </div>
-                
+
                 <button className="w-full mt-6 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-teal-500/30 transition-all duration-300 hover:-translate-y-0.5">
                   View Full Schedule
                 </button>
@@ -550,19 +548,19 @@ const LandingPage = () => {
                 <Icons.Lock />
                 <span className="text-white/90 text-sm font-medium">Privacy by Design</span>
               </div>
-              
+
               <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
                 Your Data,{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 to-teal-200">
                   Fully Protected
                 </span>
               </h2>
-              
+
               <p className="text-xl text-white/70 mb-8 leading-relaxed">
-                We believe donor data and medical records should be private, secure, and completely under your control. 
+                We believe donor data and medical records should be private, secure, and completely under your control.
                 Our platform is built with HIPAA-compliant security at its core.
               </p>
-              
+
               <div className="space-y-4">
                 {[
                   { icon: '🔒', title: 'End-to-End Encryption', desc: 'All donor and hospital data is encrypted in transit and at rest' },
@@ -580,7 +578,7 @@ const LandingPage = () => {
                 ))}
               </div>
             </div>
-            
+
             <div className="relative">
               <FloatingElement>
                 <GlassCard className="p-8">
@@ -593,7 +591,7 @@ const LandingPage = () => {
                     <h3 className="text-2xl font-bold text-gray-800 mb-2">Security Score</h3>
                     <p className="text-gray-500">Your account protection level</p>
                   </div>
-                  
+
                   <div className="space-y-4">
                     {[
                       { label: 'Two-Factor Auth', status: true },
@@ -615,7 +613,7 @@ const LandingPage = () => {
                       </div>
                     ))}
                   </div>
-                  
+
                   <div className="mt-6 p-4 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm text-gray-600">Overall Protection</span>
@@ -645,11 +643,11 @@ const LandingPage = () => {
                 </span>
               </h2>
               <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-                Join hundreds of blood banks and hospitals who have already streamlined their operations. 
+                Join hundreds of blood banks and hospitals who have already streamlined their operations.
                 Start your free trial today—no credit card required.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button 
+                <button
                   onClick={() => navigate('/login')}
                   className="px-10 py-5 bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-bold text-lg rounded-2xl shadow-2xl shadow-teal-500/30 hover:shadow-teal-500/50 transition-all duration-300 hover:-translate-y-1 hover:scale-105"
                 >
@@ -664,6 +662,91 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Team Section */}
+      <section className="relative z-10 px-6 py-24 bg-white/5 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-4xl lg:text-5xl font-bold text-white mb-12">
+            Meet the{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 to-teal-200">
+              Makers
+            </span>
+          </h2>
+
+          <div className="flex flex-wrap justify-center gap-8">
+            {/* Nachiket */}
+            <a
+              href="https://www.linkedin.com/in/nachiket-kale-5363001b3"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative w-64 p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:-translate-y-2"
+            >
+              <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-3xl font-bold text-white shadow-lg shadow-cyan-500/30">
+                NK
+              </div>
+              <h3 className="text-xl font-bold text-white mb-1">Nachiket Kale</h3>
+              <p className="text-teal-200 text-sm mb-4">Team Leader</p>
+              <div className="flex items-center justify-center gap-2 text-white/60 group-hover:text-white transition-colors">
+                <span className="text-sm">View Profile</span>
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                </svg>
+              </div>
+            </a>
+
+            {/* Abhishek */}
+            <a
+              href="https://www.linkedin.com/in/abhishek-chaudhari-949002356"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative w-64 p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:-translate-y-2"
+            >
+              <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center text-3xl font-bold text-white shadow-lg shadow-purple-500/30">
+                AC
+              </div>
+              <h3 className="text-xl font-bold text-white mb-1">Abhishek Chaudhari</h3>
+              <p className="text-purple-200 text-sm mb-4">Full Stack Developer</p>
+              <div className="flex items-center justify-center gap-2 text-white/60 group-hover:text-white transition-colors">
+                <span className="text-sm">View Profile</span>
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                </svg>
+              </div>
+            </a>
+
+            {/* Harsh */}
+            <div
+              className="group relative w-64 p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 cursor-default"
+            >
+              <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center text-3xl font-bold text-white shadow-lg shadow-orange-500/30">
+                H
+              </div>
+              <h3 className="text-xl font-bold text-white mb-1">Harsh</h3>
+              <p className="text-orange-200 text-sm mb-4">Full Stack Developer</p>
+            </div>
+
+            {/* Deep */}
+            <a
+              href="https://www.linkedin.com/in/deep-mehta-857a09304/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative w-64 p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:-translate-y-2"
+            >
+              <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-3xl font-bold text-white shadow-lg shadow-blue-500/30">
+                D
+              </div>
+              <h3 className="text-xl font-bold text-white mb-1">Deep Mehta</h3>
+              <p className="text-blue-200 text-sm mb-4">Full Stack Developer</p>
+              <div className="flex items-center justify-center gap-2 text-white/60 group-hover:text-white transition-colors">
+                <span className="text-sm">View Profile</span>
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                </svg>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="relative z-10 px-6 py-12 border-t border-white/10">
         <div className="max-w-7xl mx-auto">
@@ -672,17 +755,17 @@ const LandingPage = () => {
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/30 to-white/10 backdrop-blur-lg flex items-center justify-center border border-white/20">
                   <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C12 2 4 8.5 4 13.5C4 17.64 7.58 21 12 21C16.42 21 20 17.64 20 13.5C20 8.5 12 2 12 2Z"/>
+                    <path d="M12 2C12 2 4 8.5 4 13.5C4 17.64 7.58 21 12 21C16.42 21 20 17.64 20 13.5C20 8.5 12 2 12 2Z" />
                   </svg>
                 </div>
                 <span className="text-xl font-bold text-white">BloodLink</span>
               </div>
               <p className="text-white/60 max-w-sm leading-relaxed">
-                Empowering blood banks with smart management solutions. 
+                Empowering blood banks with smart management solutions.
                 Making blood donation tracking simple, secure, and accessible for everyone.
               </p>
             </div>
-            
+
             <div>
               <h4 className="text-white font-semibold mb-4">Product</h4>
               <ul className="space-y-2">
@@ -692,7 +775,7 @@ const LandingPage = () => {
                 <li><a href="#" className="text-white/60 hover:text-white transition-colors">Pricing</a></li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="text-white font-semibold mb-4">Company</h4>
               <ul className="space-y-2">
@@ -703,7 +786,7 @@ const LandingPage = () => {
               </ul>
             </div>
           </div>
-          
+
           <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-white/40 text-sm">
               © 2024 BloodLink. Built for Healthcare Innovation Hackathon.

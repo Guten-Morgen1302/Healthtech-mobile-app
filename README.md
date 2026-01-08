@@ -24,7 +24,7 @@ Every 2 seconds, someone needs blood, yet **38% of blood requests go unfulfilled
 
 </td>
 <td width="40%">
-<img src="image.png" width="100%" alt="BloodLink Landing Page">
+<img src="images/image.png" width="100%" alt="BloodLink Landing Page">
 </td>
 </tr>
 </table>
@@ -271,16 +271,16 @@ node seedHospitalCredentials.js
       <td><b>🩸 Blood Inventory</b></td>
     </tr>
     <tr>
-      <td><img src="Dashboard.png" alt="Dashboard"></td>
-      <td><img src="Blood_Inventory.png" alt="Inventory"></td>
+      <td><img src="images/Dashboard.png" alt="Dashboard"></td>
+      <td><img src="images/Blood_Inventory.png" alt="Inventory"></td>
     </tr>
     <tr>
       <td><b>🤝 Donor Management</b></td>
       <td><b>🏥 Hospital Network</b></td>
     </tr>
     <tr>
-      <td><img src="Donors.png" alt="Donors"></td>
-      <td><img src="Hospital_Network.png" alt="Hospitals"></td>
+      <td><img src="images/Donors.png" alt="Donors"></td>
+      <td><img src="images/Hospital_Network.png" alt="Hospitals"></td>
     </tr>
   </table>
 </div>

@@ -246,7 +246,7 @@ npm start
 ### 3️⃣ Frontend Setup
 ```bash
 cd blood-bank-app
-npm install
+npm install --legacy-peer-deps
 
 # Start the React app
 npm start
@@ -295,11 +295,34 @@ node seedHospitalCredentials.js
   </a>
 </div>
 
-## 📱 API Documentation
+## 📱 Live Deployment
 
 <div align="center">
-  <a href="blood-bank-backend/Blood_Bank_API.postman_collection.json" target="_blank">
-    <img src="https://img.shields.io/badge/📦-Postman_Collection-FF6C37?style=for-the-badge&logo=postman&logoColor=white">
+  <a href="https://blood-bank-frontend1.netlify.app" target="_blank">
+    <img src="https://img.shields.io/badge/🌐-Live_Frontend-00C7B7?style=for-the-badge&logo=netlify&logoColor=white" alt="Live Frontend">
+  </a>
+  <a href="https://blood-bank-backend-6nml.onrender.com/api" target="_blank">
+    <img src="https://img.shields.io/badge/⚙️-Live_API-46E3B7?style=for-the-badge&logo=render&logoColor=white" alt="Live API">
+  </a>
+</div>
+
+## 📚 Documentation
+
+<div align="center">
+  <a href="documentation/API_DOCUMENTATION.md">
+    <img src="https://img.shields.io/badge/📖-API_Documentation-DC143C?style=for-the-badge" alt="API Docs">
+  </a>
+  <a href="documentation/BloodLink_API.postman_collection.json">
+    <img src="https://img.shields.io/badge/📦-Postman_Collection-FF6C37?style=for-the-badge&logo=postman&logoColor=white" alt="Postman">
+  </a>
+  <a href="documentation/DATABASE_SCHEMA.md">
+    <img src="https://img.shields.io/badge/💾-Database_Schema-4DB33D?style=for-the-badge&logo=mongodb&logoColor=white" alt="Database">
+  </a>
+  <a href="documentation/ARCHITECTURE.md">
+    <img src="https://img.shields.io/badge/🏗️-Architecture-0078D4?style=for-the-badge" alt="Architecture">
+  </a>
+  <a href="documentation/TESTING_GUIDE.md">
+    <img src="https://img.shields.io/badge/🧪-Testing_Guide-00C7B7?style=for-the-badge" alt="Testing">
   </a>
 </div>
 
@@ -394,8 +417,11 @@ node seedHospitalCredentials.js
   <a href="blood-bank-app/README.md">
     <img src="https://img.shields.io/badge/📖-Frontend_Documentation-8B0000?style=for-the-badge" alt="Frontend Docs">
   </a>
-  <a href="GITHUB_PAGES_DEPLOYMENT.md">
+  <a href="DEPLOYMENT_GUIDE.md">
     <img src="https://img.shields.io/badge/🚀-Deployment_Guide-B22222?style=for-the-badge" alt="Deployment">
+  </a>
+  <a href="blood-bank-backend/QUICK_START.md">
+    <img src="https://img.shields.io/badge/⚡-Quick_Start-FF4500?style=for-the-badge" alt="Quick Start">
   </a>
 </div>
 

@@ -16,8 +16,10 @@ const corsOptions = {
     const allowedOrigins = [
       'http://localhost:3000',
       'http://localhost:5173',
-      'https://bbmanagement.netlify.app'
-    ];
+      'https://bbmanagement.netlify.app',
+      'https://blood-bank-frontend.onrender.com',
+      process.env.FRONTEND_URL // Dynamic frontend URL from environment variable
+    ].filter(Boolean); // Remove undefined values
 
     // Allow requests with no origin (like mobile apps or Postman)
     if (!origin) return callback(null, true);

@@ -17,7 +17,7 @@ const corsOptions = {
       'http://localhost:3000',
       'http://localhost:5173',
       'https://bbmanagement.netlify.app',
-      'https://blood-bank-frontend.onrender.com',
+      'https://blood-bank-frontend1.netlify.app',
       process.env.FRONTEND_URL // Dynamic frontend URL from environment variable
     ].filter(Boolean); // Remove undefined values
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StatCard from '../components/ui/StatCard';
 import { analyticsAPI } from '../services/api';
-import { Droplets, Users, CheckCircle, AlertTriangle, Plus, UserPlus, FileText, Loader2, Calendar, Building2 } from 'lucide-react';
+import { Droplets, Users, CheckCircle, AlertTriangle, Plus, UserPlus, FileText, Loader2, Building2, Tent } from 'lucide-react';
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -146,10 +146,10 @@ const DashboardPage = () => {
               iconColor="text-red-600"
             />
             <StatCard
-              title="Upcoming Appointments"
-              value={stats.upcomingAppointments}
+              title="Donation Camps"
+              value={stats.camps || 0}
               detail="Scheduled donations"
-              icon={Calendar}
+              icon={Tent}
               iconColor="text-blue-600"
             />
             <StatCard
@@ -220,11 +220,11 @@ const DashboardPage = () => {
                 <span>Manage Recipients</span>
               </button>
               <button 
-                onClick={() => navigate('/appointments')}
+                onClick={() => navigate('/camps')}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-150 shadow-sm flex items-center justify-center gap-2"
               >
-                <Calendar className="h-5 w-5" />
-                <span>Appointments</span>
+                <Tent className="h-5 w-5" />
+                <span>Donation Camps</span>
               </button>
               <button 
                 onClick={() => navigate('/blood-requests')}

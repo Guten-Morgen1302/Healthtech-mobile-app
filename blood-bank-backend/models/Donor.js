@@ -36,7 +36,7 @@ const donorSchema = new mongoose.Schema({
     default: Date.now
   },
   City_Id: {
-    type: Number,
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'City'
   },
   

@@ -43,16 +43,19 @@ const MOCK_BLOOD_BANKS = {
   ]
 };
 
-// Mock healthcare facilities
+// Mock healthcare facilities - Mumbai focused with realistic distances
+// Reference point: Mumbai Central (19.0760, 72.8777)
 const MOCK_FACILITIES = [
-  { id: 1, facilityId: 'FAC001', name: 'Apollo Hospitals', address: 'Greams Lane, Off Greams Road', city: 'Chennai', state: 'Tamil Nadu', pincode: '600006', contact: '044-28293333', email: 'info@apollohospitals.com', latitude: 13.0569, longitude: 80.2425, distance: 2.5, facilityType: 'Multi-Specialty Hospital' },
-  { id: 2, facilityId: 'FAC002', name: 'Fortis Healthcare', address: 'Sector 62, Phase VIII', city: 'Mohali', state: 'Punjab', pincode: '160062', contact: '0172-5096000', email: 'info@fortishealthcare.com', latitude: 30.7046, longitude: 76.7179, distance: 1.8, facilityType: 'Multi-Specialty Hospital' },
-  { id: 3, facilityId: 'FAC003', name: 'Max Super Speciality Hospital', address: 'Press Enclave Road', city: 'Saket, New Delhi', state: 'Delhi', pincode: '110017', contact: '011-26515050', email: 'info@maxhealthcare.com', latitude: 28.5244, longitude: 77.2067, distance: 3.2, facilityType: 'Super Specialty Hospital' },
-  { id: 4, facilityId: 'FAC004', name: 'Manipal Hospital', address: '98, Rustom Bagh', city: 'Bangalore', state: 'Karnataka', pincode: '560017', contact: '080-25024444', email: 'info@manipalhospitals.com', latitude: 12.9698, longitude: 77.6489, distance: 4.1, facilityType: 'Multi-Specialty Hospital' },
-  { id: 5, facilityId: 'FAC005', name: 'Medanta - The Medicity', address: 'Sector 38', city: 'Gurugram', state: 'Haryana', pincode: '122001', contact: '0124-4141414', email: 'info@medanta.org', latitude: 28.4353, longitude: 77.0535, distance: 5.5, facilityType: 'Multi-Specialty Hospital' },
-  { id: 6, facilityId: 'FAC006', name: 'Narayana Health', address: '258/A, Bommasandra Industrial Area', city: 'Bangalore', state: 'Karnataka', pincode: '560099', contact: '080-71222222', email: 'info@narayanahealth.org', latitude: 12.8050, longitude: 77.6869, distance: 6.8, facilityType: 'Cardiac Care Hospital' },
-  { id: 7, facilityId: 'FAC007', name: 'Kokilaben Dhirubhai Ambani Hospital', address: 'Four Bungalows, Andheri West', city: 'Mumbai', state: 'Maharashtra', pincode: '400053', contact: '022-30999999', email: 'info@kokilabenhospital.com', latitude: 19.1266, longitude: 72.8304, distance: 3.7, facilityType: 'Multi-Specialty Hospital' },
-  { id: 8, facilityId: 'FAC008', name: 'Breach Candy Hospital', address: '60-A, Bhulabhai Desai Road', city: 'Mumbai', state: 'Maharashtra', pincode: '400026', contact: '022-23667788', email: 'info@breachcandyhospital.org', latitude: 18.9732, longitude: 72.8008, distance: 2.9, facilityType: 'General Hospital' },
+  { id: 1, facilityId: 'FAC001', name: 'Kokilaben Dhirubhai Ambani Hospital', address: 'Four Bungalows, Andheri West', city: 'Mumbai', state: 'Maharashtra', pincode: '400053', contact: '022-30999999', email: 'info@kokilabenhospital.com', latitude: 19.1266, longitude: 72.8304, distance: 7.2, facilityType: 'Multi-Specialty Hospital' },
+  { id: 2, facilityId: 'FAC002', name: 'Breach Candy Hospital', address: '60-A, Bhulabhai Desai Road, Breach Candy', city: 'Mumbai', state: 'Maharashtra', pincode: '400026', contact: '022-23667788', email: 'info@breachcandyhospital.org', latitude: 18.9732, longitude: 72.8008, distance: 11.5, facilityType: 'General Hospital' },
+  { id: 3, facilityId: 'FAC003', name: 'Tata Memorial Hospital', address: 'Dr. E Borges Road, Parel', city: 'Mumbai', state: 'Maharashtra', pincode: '400012', contact: '022-24177000', email: 'info@tmc.gov.in', latitude: 19.0030, longitude: 72.8435, distance: 8.3, facilityType: 'Cancer Specialty Hospital' },
+  { id: 4, facilityId: 'FAC004', name: 'Lilavati Hospital', address: 'A-791, Bandra Reclamation', city: 'Mumbai', state: 'Maharashtra', pincode: '400050', contact: '022-26751000', email: 'info@lilavatihospital.com', latitude: 19.0544, longitude: 72.8210, distance: 5.8, facilityType: 'Multi-Specialty Hospital' },
+  { id: 5, facilityId: 'FAC005', name: 'KEM Hospital', address: 'Acharya Donde Marg, Parel', city: 'Mumbai', state: 'Maharashtra', pincode: '400012', contact: '022-24136051', email: 'info@kemhospital.org', latitude: 19.0025, longitude: 72.8431, distance: 8.5, facilityType: 'Government Hospital' },
+  { id: 6, facilityId: 'FAC006', name: 'Jaslok Hospital', address: '15, Dr. G Deshmukh Marg', city: 'Mumbai', state: 'Maharashtra', pincode: '400026', contact: '022-66573333', email: 'info@jaslokhospital.net', latitude: 18.9665, longitude: 72.8060, distance: 12.4, facilityType: 'Multi-Specialty Hospital' },
+  { id: 7, facilityId: 'FAC007', name: 'Hinduja Hospital', address: 'Veer Savarkar Marg, Mahim', city: 'Mumbai', state: 'Maharashtra', pincode: '400016', contact: '022-24447777', email: 'info@hindujahospital.com', latitude: 19.0412, longitude: 72.8409, distance: 4.5, facilityType: 'Multi-Specialty Hospital' },
+  { id: 8, facilityId: 'FAC008', name: 'Nanavati Super Speciality Hospital', address: 'S.V. Road, Vile Parle West', city: 'Mumbai', state: 'Maharashtra', pincode: '400056', contact: '022-26182255', email: 'info@nanavatihospital.org', latitude: 19.1008, longitude: 72.8389, distance: 3.2, facilityType: 'Super Specialty Hospital' },
+  { id: 9, facilityId: 'FAC009', name: 'Bombay Hospital', address: '12, New Marine Lines', city: 'Mumbai', state: 'Maharashtra', pincode: '400020', contact: '022-22067676', email: 'info@bombayhospital.com', latitude: 18.9469, longitude: 72.8235, distance: 14.6, facilityType: 'Multi-Specialty Hospital' },
+  { id: 10, facilityId: 'FAC010', name: 'Holy Family Hospital', address: 'St. Andrew Road, Bandra West', city: 'Mumbai', state: 'Maharashtra', pincode: '400050', contact: '022-26431221', email: 'info@holyfamilyhospital.org', latitude: 19.0596, longitude: 72.8295, distance: 5.1, facilityType: 'General Hospital' },
 ];
 
 /**
@@ -87,12 +90,22 @@ export const fetchNearbyFacilities = async (latitude, longitude, radius = 10) =>
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 1000));
 
-  // Filter facilities based on radius
-  return MOCK_FACILITIES.filter(facility => facility.distance <= radius)
-    .map(facility => ({
-      ...facility,
-      distance: Math.max(0.5, facility.distance + (Math.random() * 1 - 0.5))
-    }));
+  // Filter facilities based on radius and apply slight randomization
+  // but ensure they stay within the radius
+  const filtered = MOCK_FACILITIES
+    .filter(facility => facility.distance <= radius)
+    .map(facility => {
+      // Add small random variation (+/- 0.3 km) but keep within radius
+      const variation = (Math.random() * 0.6 - 0.3);
+      const adjustedDistance = facility.distance + variation;
+      return {
+        ...facility,
+        distance: Math.max(0.5, Math.min(adjustedDistance, radius - 0.1))
+      };
+    })
+    .sort((a, b) => a.distance - b.distance); // Sort by distance
+
+  return filtered;
 };
 
 /**
@@ -129,8 +142,8 @@ export const getCurrentLocation = () => {
         }
       },
       {
-        enableHighAccuracy: true,
-        timeout: 10000,
+        enableHighAccuracy: false, // Changed to false for faster response
+        timeout: 30000, // Increased to 30 seconds
         maximumAge: 300000 // 5 minutes cache
       }
     );

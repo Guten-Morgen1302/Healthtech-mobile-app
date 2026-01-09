@@ -5,12 +5,35 @@ const DonorReward = require('../models/DonorReward');
 
 // @desc    Create emergency blood request and broadcast to donors
 // @route   POST /api/emergency/broadcast
-// @access  Private (Hospital)
+// @access  Private (Admin or Hospital)
 exports.createEmergencyBroadcast = async (req, res) => {
   try {
     const { bloodGroup, unitsNeeded, urgencyLevel, patientCondition, location } = req.body;
-    const hospitalId = req.hospital?._id || req.body.hospitalId;
-    const hospitalName = req.hospital?.Hosp_Name || req.body.hospitalName;
+    
+    // Get hospital ID and name from either hospital or admin request
+    let hospitalId, hospitalName;
+    
+    if (req.hospital) {
+      // Request from hospital
+      hospitalId = req.hospital._id;
+      hospitalName = req.hospital.Hosp_Name;
+    } else if (req.user) {
+      // Request from admin - must provide hospitalId and hospitalName in body
+      hospitalId = req.body.hospitalId;
+      hospitalName = req.body.hospitalName;
+      
+      if (!hospitalId || !hospitalName) {
+        return res.status(400).json({
+          success: false,
+          message: 'Admin must provide hospitalId and hospitalName in request body'
+        });
+      }
+    } else {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized - No valid user or hospital found'
+      });
+    }
 
     if (!bloodGroup || !unitsNeeded || !location?.coordinates) {
       return res.status(400).json({

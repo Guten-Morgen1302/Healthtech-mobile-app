@@ -23,7 +23,8 @@ const hospitalSchema = new mongoose.Schema({
     maxlength: 10
   },
   City_Id: {
-    type: Number
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'City'
   },
   
   // Old fields for backward compatibility

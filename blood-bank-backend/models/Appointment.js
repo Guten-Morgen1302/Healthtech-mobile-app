@@ -4,7 +4,7 @@ const appointmentSchema = new mongoose.Schema({
   donorId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Donor',
-    required: true
+    required: false // Made optional to allow non-registered users
   },
   donorName: {
     type: String,

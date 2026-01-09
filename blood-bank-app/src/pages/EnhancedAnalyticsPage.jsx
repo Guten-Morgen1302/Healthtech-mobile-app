@@ -51,12 +51,29 @@ const EnhancedAnalyticsPage = () => {
     count: item.count
   })) || [];
   
-  const topDonors = analytics?.donors?.topDonors?.map((donor, idx) => ({
-    donorName: donor.donorId?.Bd_Name || donor.donorId?.name || 'Unknown',
-    bloodGroup: donor.donorId?.Bd_Bgroup || donor.donorId?.bloodGroup || 'N/A',
-    donationCount: donor.totalDonations || donor.donationCount || 0,
-    totalPoints: donor.totalPoints || 0
-  })) || [];
+  const topDonors = analytics?.donors?.topDonors?.map((donor, idx) => {
+    // Handle different donor data structures
+    const donorName = donor.donorName || 
+                      donor.donorId?.Bd_Name || 
+                      donor.donorId?.name || 
+                      donor.name || 
+                      `Donor #${idx + 1}`;
+    const bloodGroup = donor.bloodGroup || 
+                       donor.donorId?.Bd_Bgroup || 
+                       donor.donorId?.bloodGroup || 
+                       'N/A';
+    const donationCount = donor.donationCount || 
+                          donor.totalDonations || 
+                          donor.count || 
+                          0;
+    
+    return {
+      donorName,
+      bloodGroup,
+      donationCount,
+      totalPoints: donor.totalPoints || 0
+    };
+  }).filter(donor => donor.donationCount > 0) || [];
 
   return (
     <div className="p-6">
@@ -173,28 +190,35 @@ const EnhancedAnalyticsPage = () => {
         <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
             <Award className="h-6 w-6 text-yellow-500" />
-            Top 10 Donors
+            Top Donors
           </h2>
           <div className="space-y-2 max-h-[300px] overflow-y-auto">
-            {topDonors.map((donor, idx) => (
-              <div key={idx} className="flex items-center justify-between p-2 bg-zinc-50 rounded">
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white ${
-                    idx === 0 ? 'bg-yellow-500' : idx === 1 ? 'bg-zinc-400' : idx === 2 ? 'bg-orange-600' : 'bg-zinc-300'
-                  }`}>
-                    {idx + 1}
+            {topDonors.length > 0 ? (
+              topDonors.slice(0, 10).map((donor, idx) => (
+                <div key={idx} className="flex items-center justify-between p-2 bg-zinc-50 rounded">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white ${
+                      idx === 0 ? 'bg-yellow-500' : idx === 1 ? 'bg-zinc-400' : idx === 2 ? 'bg-orange-600' : 'bg-zinc-300'
+                    }`}>
+                      {idx + 1}
+                    </div>
+                    <div>
+                      <div className="font-medium">{donor.donorName}</div>
+                      <div className="text-xs text-zinc-600">{donor.bloodGroup}</div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="font-medium">{donor.donorName || 'Unknown'}</div>
-                    <div className="text-xs text-zinc-600">{donor.bloodGroup}</div>
+                  <div className="text-right">
+                    <div className="font-bold text-blue-600">{donor.donationCount}</div>
+                    <div className="text-xs text-zinc-600">donations</div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="font-bold text-blue-600">{donor.donationCount}</div>
-                  <div className="text-xs text-zinc-600">donations</div>
-                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-zinc-500">
+                <Users className="h-12 w-12 mx-auto mb-2 opacity-30" />
+                <p>No donor data available</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>

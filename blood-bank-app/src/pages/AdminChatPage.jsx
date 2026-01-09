@@ -151,6 +151,10 @@ const AdminChatPage = () => {
 
   const selectedConversation = conversations.find(c => c.hospitalId === selectedHospitalId);
 
+  // Count hospitals with and without conversations
+  const hospitalsWithMessages = conversations.filter(c => c.lastMessage).length;
+  const hospitalsWithoutMessages = conversations.length - hospitalsWithMessages;
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-zinc-50">
@@ -175,11 +179,21 @@ const AdminChatPage = () => {
               <div className="min-w-0 flex-1">
                 <h1 className="text-base sm:text-xl font-bold text-zinc-900 truncate">Hospital Messages</h1>
                 <p className="text-xs sm:text-sm text-zinc-600 truncate">
-                  {conversations.length} conversations • {conversations.reduce((sum, c) => sum + (c.unreadCount?.admin || 0), 0)} unread
+                  {conversations.length} hospitals • {hospitalsWithMessages} active chats • {conversations.reduce((sum, c) => sum + (c.unreadCount?.admin || 0), 0)} unread
                 </p>
               </div>
             </div>
           </div>
+          
+          {/* Info banner for admin */}
+          {hospitalsWithoutMessages > 0 && (
+            <div className="mt-3 p-2.5 sm:p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-xs sm:text-sm text-blue-800">
+                <span className="font-semibold">Admin Privilege:</span> You can initiate conversations with any registered hospital. 
+                {hospitalsWithoutMessages} hospital{hospitalsWithoutMessages !== 1 ? 's' : ''} without messages can be contacted.
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -208,40 +222,65 @@ const AdminChatPage = () => {
                 <p className="text-sm sm:text-base text-zinc-500">No conversations yet</p>
               </div>
             ) : (
-              filteredConversations.map((conv) => (
-                <button
-                  key={conv.hospitalId}
-                  onClick={() => handleSelectConversation(conv.hospitalId)}
-                  className={`w-full p-3 sm:p-4 border-b border-zinc-200 hover:bg-zinc-50 transition-colors text-left ${
-                    selectedHospitalId === conv.hospitalId ? 'bg-blue-50' : ''
-                  }`}
-                >
-                  <div className="flex items-start gap-2 sm:gap-3">
-                    <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center ${
-                      selectedHospitalId === conv.hospitalId ? 'bg-blue-600' : 'bg-zinc-600'
-                    }`}>
-                      <Building2 className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="text-sm sm:text-base font-semibold text-zinc-900 truncate">{conv.hospitalName}</p>
-                        {conv.unreadCount?.admin > 0 && (
-                          <span className="ml-2 px-1.5 sm:px-2 py-0.5 bg-blue-600 text-white text-xs font-bold rounded-full flex-shrink-0">
-                            {conv.unreadCount.admin}
-                          </span>
+              filteredConversations.map((conv) => {
+                const hasMessages = conv.lastMessage || (conv.messages && conv.messages.length > 0);
+                const isApproved = conv.isApproved !== false; // Default to true if not specified
+                
+                return (
+                  <button
+                    key={conv.hospitalId}
+                    onClick={() => handleSelectConversation(conv.hospitalId)}
+                    className={`w-full p-3 sm:p-4 border-b border-zinc-200 hover:bg-zinc-50 transition-colors text-left ${
+                      selectedHospitalId === conv.hospitalId ? 'bg-blue-50' : ''
+                    }`}
+                  >
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center ${
+                        selectedHospitalId === conv.hospitalId ? 'bg-blue-600' : hasMessages ? 'bg-zinc-600' : 'bg-zinc-400'
+                      }`}>
+                        <Building2 className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                            <p className="text-sm sm:text-base font-semibold text-zinc-900 truncate">{conv.hospitalName}</p>
+                            {!isApproved && (
+                              <span className="px-1.5 py-0.5 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full flex-shrink-0">
+                                Pending
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+                            {!hasMessages && (
+                              <span className="px-1.5 sm:px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                                New
+                              </span>
+                            )}
+                            {conv.unreadCount?.admin > 0 && (
+                              <span className="px-1.5 sm:px-2 py-0.5 bg-blue-600 text-white text-xs font-bold rounded-full">
+                                {conv.unreadCount.admin}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <p className={`text-xs sm:text-sm truncate mb-1 ${
+                          hasMessages ? 'text-zinc-600' : 'text-green-600 font-medium'
+                        }`}>
+                          {hasMessages 
+                            ? conv.lastMessage 
+                            : 'Start a conversation - Click to message this hospital'}
+                        </p>
+                        {conv.lastMessageTime && (
+                          <p className="text-xs text-zinc-500 flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {formatTime(conv.lastMessageTime)}
+                          </p>
                         )}
                       </div>
-                      <p className="text-xs sm:text-sm text-zinc-600 truncate mb-1">{conv.lastMessage || 'No messages yet'}</p>
-                      {conv.lastMessageTime && (
-                        <p className="text-xs text-zinc-500 flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {formatTime(conv.lastMessageTime)}
-                        </p>
-                      )}
                     </div>
-                  </div>
-                </button>
-              ))
+                  </button>
+                );
+              })
             )}
           </div>
         </div>
@@ -281,7 +320,18 @@ const AdminChatPage = () => {
               <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-3 sm:py-4 space-y-3 sm:space-y-4">
                 {messages.length === 0 ? (
                   <div className="flex items-center justify-center h-full">
-                    <p className="text-zinc-500">No messages yet</p>
+                    <div className="text-center p-6 sm:p-8 max-w-md">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <MessageSquare className="h-8 w-8 sm:h-10 sm:w-10 text-blue-600" />
+                      </div>
+                      <h3 className="text-base sm:text-lg font-semibold text-zinc-900 mb-2">Start a Conversation</h3>
+                      <p className="text-sm sm:text-base text-zinc-600 mb-1">
+                        No messages yet with {selectedConversation?.hospitalName}
+                      </p>
+                      <p className="text-xs sm:text-sm text-blue-600 font-medium">
+                        Type a message below to initiate the conversation
+                      </p>
+                    </div>
                   </div>
                 ) : (
                   <>

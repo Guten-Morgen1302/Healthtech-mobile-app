@@ -37,7 +37,7 @@ Every 2 seconds, someone needs blood, yet **38% of blood requests go unfulfilled
   <table>
     <tr>
       <td align="center"><h3>🩺</h3><h4>Smart Inventory Management</h4><p>Real-time blood stock tracking across all blood groups</p></td>
-      <td align="center"><h3>🤝</h3><h4>Donor Management</h4><p>Complete registration, tracking, and reward system</p></td>
+      <td align="center"><h3>🤝</h3><h4>Donor Management</h4><p>Complete registration and tracking system</p></td>
     </tr>
     <tr>
       <td align="center"><h3>🏥</h3><h4>Hospital Network</h4><p>Seamless coordination between blood banks and hospitals</p></td>
@@ -48,16 +48,12 @@ Every 2 seconds, someone needs blood, yet **38% of blood requests go unfulfilled
       <td align="center"><h3>🎪</h3><h4>Blood Donation Camps</h4><p>Organize and manage donation drives</p></td>
     </tr>
     <tr>
-      <td align="center"><h3>💬</h3><h4>Real-Time Chat</h4><p>Communication between staff and hospitals</p></td>
+      <td align="center"><h3>💬</h3><h4>Real-Time Chat</h4><p>Communication between admin and hospitals</p></td>
       <td align="center"><h3>🔔</h3><h4>Smart Notifications</h4><p>Automated alerts for expiry, low stock & matches</p></td>
     </tr>
     <tr>
-      <td align="center"><h3>📅</h3><h4>Appointment Scheduling</h4><p>Book and manage donation appointments</p></td>
-      <td align="center"><h3>🏆</h3><h4>Donor Rewards</h4><p>Gamification to encourage regular donations</p></td>
-    </tr>
-    <tr>
       <td align="center"><h3>🔐</h3><h4>Multi-Role Access</h4><p>Secure role-based authentication for all users</p></td>
-      <td align="center"><h3>🌐</h3><h4>Multi-Language Support</h4><p>Built-in i18n for regional accessibility</p></td>
+      <td align="center"><h3>🗺️</h3><h4>ABDM Network Integration</h4><p>Access nearby blood bank facilities</p></td>
     </tr>
   </table>
 </div>
@@ -86,11 +82,11 @@ Every 2 seconds, someone needs blood, yet **38% of blood requests go unfulfilled
 
 ## 🎓 Target Users
 
-- 🏥 **Hospitals & Clinics** – Real-time access to blood inventory, emergency requests, and automated matching  
-- 🩸 **Blood Banks** – Comprehensive management of donors, inventory, camps, and hospital network  
-- 👨‍⚕️ **Healthcare Staff** – Recording donations, managing appointments, and processing requests  
-- 🤝 **Blood Donors** – Easy registration, appointment booking, donation history, and rewards tracking  
-- 🚨 **Emergency Services** – Instant access to blood availability during critical situations
+- 🏥 **Blood Bank Administrators** – Comprehensive management of inventory, donors, recipients, and hospital network  
+- 🩸 **Hospital Managers** – Submit blood requests, track inventory, and communicate with blood banks  
+- 👨‍⚕️ **Healthcare Staff** – Recording donations, managing camps, and processing requests  
+- 🚨 **Emergency Services** – Instant access to blood availability during critical situations  
+- 📊 **Healthcare Analysts** – Access to analytics and reporting for data-driven decisions
 
 <img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif" width="100%">
 
@@ -139,8 +135,8 @@ BloodLink is architected as a comprehensive full-stack solution:
 - Complete donor registration with validation
 - Donation history tracking
 - Eligibility checks (age, health status)
-- Donor rewards and points system
-- Automated reminders for next donation
+- Automated notifications for eligible donors
+- Comprehensive donor database
 
 ### 🏥 Hospital Network
 - Hospital registration and authentication
@@ -163,14 +159,7 @@ BloodLink is architected as a comprehensive full-stack solution:
 - Registration tracking
 - Success metrics
 
-### 📅 Appointment System
-- Online appointment booking
-- Calendar integration
-- SMS/Email confirmations
-- Reminder notifications
-- Walk-in management
-
-### 🚨 Emergency Requests
+###  Emergency Requests
 - Priority request handling
 - Instant notifications to donors
 - Multi-hospital coordination
@@ -179,10 +168,10 @@ BloodLink is architected as a comprehensive full-stack solution:
 
 ### 💬 Communication Hub
 - In-app chat system
-- Hospital-staff messaging
+- Hospital-admin messaging
 - Broadcast notifications
-- Request discussions
-- Support tickets
+- Request status updates
+- Real-time communication
 
 <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="Divider">
 

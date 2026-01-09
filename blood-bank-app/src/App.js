@@ -27,8 +27,6 @@ import AdminRequestsPage from './pages/AdminRequestsPage';
 
 // New Feature Pages
 import EmergencySOSPage from './pages/EmergencySOSPageNew';
-import AppointmentsPage from './pages/AppointmentsPage';
-import RewardsPage from './pages/RewardsPage';
 import CampsPage from './pages/CampsPage';
 import BloodStockMapPage from './pages/BloodStockMapPage';
 import EnhancedAnalyticsPage from './pages/EnhancedAnalyticsPage';
@@ -96,8 +94,6 @@ function App() {
                 
                 {/* New Feature Routes */}
                 <Route path="emergency" element={<EmergencySOSPage />} />
-                <Route path="appointments" element={<AppointmentsPage />} />
-                <Route path="rewards" element={<RewardsPage />} />
                 <Route path="camps" element={<CampsPage />} />
                 <Route path="map" element={<BloodStockMapPage />} />
                 <Route path="analytics" element={<EnhancedAnalyticsPage />} />
@@ -112,8 +108,6 @@ function App() {
               <Route path="/chat" element={<Navigate to="/app/chat" replace />} />
               <Route path="/requests" element={<Navigate to="/app/requests" replace />} />
               <Route path="/emergency" element={<Navigate to="/app/emergency" replace />} />
-              <Route path="/appointments" element={<Navigate to="/app/appointments" replace />} />
-              <Route path="/rewards" element={<Navigate to="/app/rewards" replace />} />
               <Route path="/camps" element={<Navigate to="/app/camps" replace />} />
               <Route path="/map" element={<Navigate to="/app/map" replace />} />
               <Route path="/analytics" element={<Navigate to="/app/analytics" replace />} />

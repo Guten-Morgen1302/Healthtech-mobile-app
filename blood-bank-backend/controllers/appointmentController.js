@@ -22,6 +22,14 @@ exports.createAppointment = async (req, res) => {
       healthQuestionnaire 
     } = req.body;
 
+    // Validate required fields
+    if (!donorName || !donorPhone || !bloodGroup || !appointmentDate || !timeSlot || !location) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide all required fields: name, phone, blood group, date, time slot, and location'
+      });
+    }
+
     // Check if slot is available
     const existingAppointment = await Appointment.findOne({
       appointmentDate,
@@ -42,7 +50,7 @@ exports.createAppointment = async (req, res) => {
     let eligibilityReasons = [];
 
     if (healthQuestionnaire) {
-      if (healthQuestionnaire.weight < 50) {
+      if (healthQuestionnaire.weight && healthQuestionnaire.weight < 50) {
         isEligible = false;
         eligibilityReasons.push('Weight must be at least 50kg');
       }
@@ -71,7 +79,7 @@ exports.createAppointment = async (req, res) => {
     }
 
     const appointment = await Appointment.create({
-      donorId,
+      donorId: donorId || null,
       donorName,
       donorPhone,
       donorEmail,

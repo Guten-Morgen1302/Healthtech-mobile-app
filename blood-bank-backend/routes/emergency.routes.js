@@ -9,14 +9,15 @@ const {
 } = require('../controllers/emergencyController');
 const isHospitalAuthenticated = require('../middleware/isHospitalAuthenticated');
 const isAuthenticated = require('../middleware/isAuthenticated');
+const isAdminOrHospital = require('../middleware/isAdminOrHospital');
 
 // Public routes
 router.get('/active', getActiveEmergencies);
 router.get('/:id', getEmergencyById);
 router.post('/:id/respond', respondToEmergency);
 
-// Hospital routes
-router.post('/broadcast', isHospitalAuthenticated, createEmergencyBroadcast);
+// Admin or Hospital routes
+router.post('/broadcast', isAdminOrHospital, createEmergencyBroadcast);
 
 // Admin routes
 router.put('/:id/status', isAuthenticated, updateEmergencyStatus);

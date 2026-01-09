@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { appointmentsAPI } from '../services/api';
 import { useToast } from '../context/ToastContext';
+import { useAuth } from '../context/AuthContext';
 import { Calendar, Clock, MapPin, Check } from 'lucide-react';
 
 const AppointmentsPage = () => {
   const { success, error } = useToast();
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [selectedDate, setSelectedDate] = useState('');
   const [availableSlots, setAvailableSlots] = useState([]);
@@ -44,16 +46,28 @@ const AppointmentsPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Check if user is logged in
+    if (!user || !user._id) {
+      error('Login Required', 'Please login to book an appointment');
+      return;
+    }
+
     try {
       const response = await appointmentsAPI.create({
         ...formData,
-        donorId: 'temp-donor-id', // Replace with actual donor ID from auth
+        donorId: user._id,
+        donorName: formData.donorName || user.Bd_Name || user.name || 'Unknown Donor',
+        donorPhone: formData.donorPhone || user.Bd_Cell_Num || user.phone || user.Bd_Phone || '',
+        donorEmail: formData.donorEmail || user.Bd_Email || user.email || '',
+        bloodGroup: formData.bloodGroup || user.Bd_Blood_Group || user.bloodGroup || user.Bd_Bgroup || '',
         appointmentDate: selectedDate
       });
       
       success('Appointment Booked!', 'Your blood donation appointment has been confirmed');
       // Reset form
       setStep(1);
+      setSelectedDate('');
+      setAvailableSlots([]);
       setFormData({
         donorName: '',
         donorPhone: '',
@@ -72,6 +86,7 @@ const AppointmentsPage = () => {
         }
       });
     } catch (err) {
+      console.error('Appointment booking error:', err);
       error('Booking Failed', err.response?.data?.message || 'Please try again');
     }
   };

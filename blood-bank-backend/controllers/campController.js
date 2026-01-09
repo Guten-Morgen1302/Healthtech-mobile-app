@@ -105,6 +105,14 @@ exports.registerForCamp = async (req, res) => {
     const { id } = req.params;
     const { donorId, donorName, donorPhone, donorEmail, bloodGroup } = req.body;
 
+    // Validate required fields
+    if (!donorName || !donorPhone || !bloodGroup) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide donor name, phone, and blood group'
+      });
+    }
+
     const camp = await DonationCamp.findById(id);
 
     if (!camp) {
@@ -121,9 +129,10 @@ exports.registerForCamp = async (req, res) => {
       });
     }
 
-    // Check if already registered
+    // Check if already registered (by donorId or phone)
     const existing = camp.registrations.find(
-      r => r.donorId && r.donorId.toString() === donorId
+      r => (r.donorId && donorId && r.donorId.toString() === donorId.toString()) || 
+           (r.donorPhone === donorPhone)
     );
 
     if (existing) {
@@ -134,7 +143,7 @@ exports.registerForCamp = async (req, res) => {
     }
 
     camp.registrations.push({
-      donorId,
+      donorId: donorId || null,
       donorName,
       donorPhone,
       donorEmail,
@@ -152,7 +161,7 @@ exports.registerForCamp = async (req, res) => {
     console.error('Error registering for camp:', error);
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message || 'Failed to register for camp'
     });
   }
 };

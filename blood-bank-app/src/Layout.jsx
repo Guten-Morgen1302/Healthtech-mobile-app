@@ -27,8 +27,7 @@ const Layout = () => {
         return 'Hospital Network';
       case '/app/emergency':
         return 'Emergency SOS';
-      case '/app/appointments':
-        return 'Appointments';
+
       case '/app/rewards':
         return 'Rewards';
       case '/app/camps':

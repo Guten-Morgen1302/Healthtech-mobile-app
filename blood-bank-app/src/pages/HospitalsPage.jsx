@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { hospitalsAPI, citiesAPI } from '../services/api';
+import { hospitalsAPI, citiesAPI, adminHospitalsAPI } from '../services/api';
 import { fetchNearbyFacilities, getCurrentLocation } from '../services/eRaktKoshService';
 import DataTable from '../components/shared/DataTable';
-import { Plus, Edit, Trash2, Loader2, Search, X, Globe, MapPin, Phone, Mail, Building2, Navigation, RefreshCw } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Search, X, Globe, MapPin, Phone, Mail, Building2, Navigation, RefreshCw, Check, XCircle, Clock } from 'lucide-react';
 
 
 const HospitalsPage = () => {
@@ -15,6 +15,7 @@ const HospitalsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'approved', 'pending'
   const [showModal, setShowModal] = useState(false);
   const [editingHospital, setEditingHospital] = useState(null);
   const [formData, setFormData] = useState({
@@ -85,8 +86,12 @@ const HospitalsPage = () => {
       setUserLocation(location);
       await searchEraktKoshFacilities(location.latitude, location.longitude);
     } catch (err) {
-      setEraktKoshError(err.message || 'Failed to get your location');
-      setEraktKoshLoading(false);
+      console.error('Location error:', err);
+      // Use default location (Mumbai) as fallback
+      const defaultLocation = { latitude: 19.0760, longitude: 72.8777 };
+      setUserLocation(defaultLocation);
+      setEraktKoshError('Using default location (Mumbai). ' + (err.message || 'Location access denied'));
+      await searchEraktKoshFacilities(defaultLocation.latitude, defaultLocation.longitude);
     }
   };
 
@@ -166,6 +171,29 @@ const HospitalsPage = () => {
       isApproved: true
     });
     setShowModal(true);
+  };
+
+  const handleApproval = async (hospitalId, isApproved) => {
+    if (user?.role !== 'manager') {
+      warning('Permission denied', 'Only managers can approve hospitals');
+      return;
+    }
+
+    const action = isApproved ? 'approve' : 'reject';
+    if (!window.confirm(`Are you sure you want to ${action} this hospital registration?`)) {
+      return;
+    }
+
+    try {
+      await adminHospitalsAPI.updateApproval(hospitalId, isApproved);
+      success(
+        `Hospital ${isApproved ? 'approved' : 'rejected'}`,
+        `The hospital registration has been ${isApproved ? 'approved' : 'rejected'} successfully`
+      );
+      fetchHospitals();
+    } catch (err) {
+      showError(`Failed to ${action} hospital`, err.response?.data?.message || 'An error occurred');
+    }
   };
 
   // Helper function to get City_Id by city name (for backward compatibility)
@@ -255,25 +283,64 @@ const HospitalsPage = () => {
       render: (row) => getCityName(row.City_Id) || row.city || 'N/A'
     },
     {
+      header: 'Status',
+      accessor: 'isApproved',
+      render: (row) => (
+        <span className={`px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1 ${
+          row.isApproved === false
+            ? 'bg-yellow-100 text-yellow-800 border border-yellow-300'
+            : 'bg-green-100 text-green-800 border border-green-300'
+        }`}>
+          {row.isApproved === false ? (
+            <><Clock className="h-3 w-3" /> Pending</>
+          ) : (
+            <><Check className="h-3 w-3" /> Approved</>
+          )}
+        </span>
+      )
+    },
+    {
       header: 'Actions',
       render: (row) => (
         <div className="flex gap-2">
           {user?.role === 'manager' && (
             <>
-              <button 
-                onClick={() => handleEditClick(row)}
-                className="text-blue-600 hover:text-blue-800 p-1.5 rounded hover:bg-blue-50 transition-colors"
-                title="Edit hospital"
-              >
-                <Edit className="h-4 w-4" />
-              </button>
-              <button 
-                onClick={() => handleDelete(row._id)}
-                className="text-red-600 hover:text-red-800 p-1.5 rounded hover:bg-red-50 transition-colors"
-                title="Delete hospital"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
+              {row.isApproved === false && (
+                <>
+                  <button 
+                    onClick={() => handleApproval(row._id, true)}
+                    className="text-green-600 hover:text-green-800 p-1.5 rounded hover:bg-green-50 transition-colors"
+                    title="Approve hospital"
+                  >
+                    <Check className="h-4 w-4" />
+                  </button>
+                  <button 
+                    onClick={() => handleApproval(row._id, false)}
+                    className="text-red-600 hover:text-red-800 p-1.5 rounded hover:bg-red-50 transition-colors"
+                    title="Reject hospital"
+                  >
+                    <XCircle className="h-4 w-4" />
+                  </button>
+                </>
+              )}
+              {row.isApproved !== false && (
+                <>
+                  <button 
+                    onClick={() => handleEditClick(row)}
+                    className="text-blue-600 hover:text-blue-800 p-1.5 rounded hover:bg-blue-50 transition-colors"
+                    title="Edit hospital"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(row._id)}
+                    className="text-red-600 hover:text-red-800 p-1.5 rounded hover:bg-red-50 transition-colors"
+                    title="Delete hospital"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </>
+              )}
             </>
           )}
           {user?.role !== 'manager' && (
@@ -284,8 +351,13 @@ const HospitalsPage = () => {
     }
   ];
 
-  // Filter hospitals based on search term
+  // Filter hospitals based on search term and status
   const filteredHospitals = hospitals.filter(hospital => {
+    // Status filter
+    if (statusFilter === 'approved' && hospital.isApproved !== true) return false;
+    if (statusFilter === 'pending' && hospital.isApproved !== false) return false;
+    
+    // Search filter
     const searchLower = searchTerm.toLowerCase();
     return (
       (hospital.Hosp_Name || hospital.name)?.toLowerCase().includes(searchLower) ||
@@ -387,17 +459,56 @@ const HospitalsPage = () => {
             </div>
           )}
 
-          <div className="mb-6 bg-white p-4 rounded-lg shadow-sm border border-zinc-200">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400" />
-              <input
-                type="text"
-                placeholder="Search by name, city, or type..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-              />
+          <div className="mb-6 space-y-4">
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-zinc-200">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400" />
+                <input
+                  type="text"
+                  placeholder="Search by name, city, or type..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                />
+              </div>
             </div>
+            
+            {user?.role === 'manager' && (
+              <div className="bg-white p-3 rounded-lg shadow-sm border border-zinc-200 flex flex-wrap gap-2">
+                <button
+                  onClick={() => setStatusFilter('all')}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${
+                    statusFilter === 'all'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
+                  }`}
+                >
+                  All ({hospitals.length})
+                </button>
+                <button
+                  onClick={() => setStatusFilter('approved')}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all text-sm flex items-center gap-1.5 ${
+                    statusFilter === 'approved'
+                      ? 'bg-green-600 text-white shadow-sm'
+                      : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
+                  }`}
+                >
+                  <Check className="h-4 w-4" />
+                  Approved ({hospitals.filter(h => h.isApproved !== false).length})
+                </button>
+                <button
+                  onClick={() => setStatusFilter('pending')}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all text-sm flex items-center gap-1.5 ${
+                    statusFilter === 'pending'
+                      ? 'bg-yellow-600 text-white shadow-sm'
+                      : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
+                  }`}
+                >
+                  <Clock className="h-4 w-4" />
+                  Pending ({hospitals.filter(h => h.isApproved === false).length})
+                </button>
+              </div>
+            )}
           </div>
 
           <DataTable columns={columns} data={filteredHospitals} />

@@ -141,18 +141,62 @@ exports.getHospitalUnreadCount = async (req, res) => {
 
 // ============= ADMIN SIDE =============
 
-// @desc    Get all chat conversations (for admin)
+// @desc    Get all chat conversations (for admin) - includes all hospitals
 // @route   GET /api/admin/chat/conversations
 // @access  Private (Admin)
 exports.getAllConversations = async (req, res) => {
   try {
+    // Get all hospitals (both approved and pending) - Admin should see all
+    const hospitals = await Hospital.find({})
+      .select('_id Hosp_Name email isApproved')
+      .sort({ Hosp_Name: 1 });
+
+    // Get existing chats
     const chats = await Chat.find({ isActive: true })
-      .select('hospitalId hospitalName hospitalEmail lastMessage lastMessageTime lastMessageSender unreadCount')
-      .sort({ lastMessageTime: -1 });
+      .select('hospitalId hospitalName hospitalEmail lastMessage lastMessageTime lastMessageSender unreadCount');
+
+    // Create a map of existing chats
+    const chatMap = {};
+    chats.forEach(chat => {
+      chatMap[chat.hospitalId.toString()] = chat;
+    });
+
+    // Build conversation list with all hospitals
+    const conversations = hospitals.map(hospital => {
+      const existingChat = chatMap[hospital._id.toString()];
+      
+      if (existingChat) {
+        return {
+          ...existingChat.toObject(),
+          isApproved: hospital.isApproved
+        };
+      } else {
+        // Return hospital without chat history (admin can initiate)
+        return {
+          hospitalId: hospital._id,
+          hospitalName: hospital.Hosp_Name || hospital.name,
+          hospitalEmail: hospital.email,
+          lastMessage: null,
+          lastMessageTime: null,
+          lastMessageSender: null,
+          unreadCount: { admin: 0, hospital: 0 },
+          messages: [],
+          isApproved: hospital.isApproved
+        };
+      }
+    });
+
+    // Sort by lastMessageTime (nulls at end)
+    conversations.sort((a, b) => {
+      if (!a.lastMessageTime && !b.lastMessageTime) return 0;
+      if (!a.lastMessageTime) return 1;
+      if (!b.lastMessageTime) return -1;
+      return new Date(b.lastMessageTime) - new Date(a.lastMessageTime);
+    });
 
     res.json({
       success: true,
-      data: chats
+      data: conversations
     });
   } catch (error) {
     console.error('Error in getAllConversations:', error);
@@ -170,12 +214,27 @@ exports.getConversationMessages = async (req, res) => {
   try {
     const { hospitalId } = req.params;
 
-    const chat = await Chat.findOne({ hospitalId });
+    let chat = await Chat.findOne({ hospitalId });
 
+    // If no chat exists, get hospital info and return empty chat
     if (!chat) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Chat not found' 
+      const hospital = await Hospital.findById(hospitalId);
+      
+      if (!hospital) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'Hospital not found' 
+        });
+      }
+
+      return res.json({
+        success: true,
+        data: {
+          hospitalName: hospital.Hosp_Name || hospital.name,
+          hospitalEmail: hospital.email,
+          messages: [],
+          unreadCount: 0
+        }
       });
     }
 

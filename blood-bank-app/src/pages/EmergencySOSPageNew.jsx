@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { emergencyAPI } from '../services/api';
+import { emergencyAPI, hospitalsAPI } from '../services/api';
 import { useToast } from '../context/ToastContext';
 import { AlertCircle, Send, MapPin, Clock, Users, Phone, Activity, Siren } from 'lucide-react';
 
@@ -7,6 +7,8 @@ const EmergencySOSPageNew = () => {
   const { success, error } = useToast();
   const [loading, setLoading] = useState(false);
   const [activeEmergencies, setActiveEmergencies] = useState([]);
+  const [hospitals, setHospitals] = useState([]);
+  const [loadingHospitals, setLoadingHospitals] = useState(true);
   const [formData, setFormData] = useState({
     hospitalId: '',
     hospitalName: '',
@@ -22,6 +24,7 @@ const EmergencySOSPageNew = () => {
 
   useEffect(() => {
     fetchActiveEmergencies();
+    fetchHospitals();
     getLocation();
   }, []);
 
@@ -51,6 +54,40 @@ const EmergencySOSPageNew = () => {
       setActiveEmergencies(response.data.data || []);
     } catch (err) {
       console.error('Error fetching emergencies:', err);
+    }
+  };
+
+  const fetchHospitals = async () => {
+    try {
+      setLoadingHospitals(true);
+      const response = await hospitalsAPI.getAll();
+      if (response.data.success) {
+        setHospitals(response.data.data || []);
+      }
+    } catch (err) {
+      console.error('Error fetching hospitals:', err);
+      error('Failed to load hospitals', 'Unable to fetch hospital list');
+    } finally {
+      setLoadingHospitals(false);
+    }
+  };
+
+  const handleHospitalChange = (e) => {
+    const selectedHospitalId = e.target.value;
+    const selectedHospital = hospitals.find(h => h._id === selectedHospitalId);
+    
+    if (selectedHospital) {
+      setFormData({
+        ...formData,
+        hospitalId: selectedHospitalId,
+        hospitalName: selectedHospital.Hosp_Name || selectedHospital.name || ''
+      });
+    } else {
+      setFormData({
+        ...formData,
+        hospitalId: '',
+        hospitalName: ''
+      });
     }
   };
 
@@ -114,30 +151,34 @@ const EmergencySOSPageNew = () => {
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Hospital Info */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Hospital Name</label>
-                    <input
-                      type="text"
-                      value={formData.hospitalName}
-                      onChange={(e) => setFormData({ ...formData, hospitalName: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
-                      placeholder="Enter hospital name"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Hospital ID</label>
-                    <input
-                      type="text"
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Select Hospital *
+                  </label>
+                  {loadingHospitals ? (
+                    <div className="w-full px-4 py-3 border border-gray-200 rounded-2xl bg-gray-50 text-gray-500">
+                      Loading hospitals...
+                    </div>
+                  ) : (
+                    <select
                       value={formData.hospitalId}
-                      onChange={(e) => setFormData({ ...formData, hospitalId: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
-                      placeholder="Hospital ID"
+                      onChange={handleHospitalChange}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white"
                       required
-                    />
-                  </div>
+                    >
+                      <option value="">-- Select Hospital --</option>
+                      {hospitals.map((hospital) => (
+                        <option key={hospital._id} value={hospital._id}>
+                          {hospital.Hosp_Name || hospital.name} (ID: {hospital._id.slice(-8)})
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  {formData.hospitalName && (
+                    <p className="mt-2 text-sm text-gray-600">
+                      Selected: {formData.hospitalName}
+                    </p>
+                  )}
                 </div>
 
                 {/* Blood Requirements */}

@@ -7,6 +7,8 @@ const EmergencySOS = () => {
   const { success, error } = useToast();
   const [loading, setLoading] = useState(false);
   const [activeEmergencies, setActiveEmergencies] = useState([]);
+  const [hospitals, setHospitals] = useState([]);
+  const [loadingHospitals, setLoadingHospitals] = useState(true);
   const [formData, setFormData] = useState({
     hospitalId: '',
     hospitalName: '',
@@ -25,6 +27,7 @@ const EmergencySOS = () => {
 
   useEffect(() => {
     fetchActiveEmergencies();
+    fetchHospitals();
     getLocation();
   }, []);
 
@@ -54,6 +57,40 @@ const EmergencySOS = () => {
       setActiveEmergencies(response.data.data || []);
     } catch (err) {
       console.error('Error fetching emergencies:', err);
+    }
+  };
+
+  const fetchHospitals = async () => {
+    try {
+      setLoadingHospitals(true);
+      const response = await hospitalsAPI.getAll();
+      if (response.data.success) {
+        setHospitals(response.data.data || []);
+      }
+    } catch (err) {
+      console.error('Error fetching hospitals:', err);
+      error('Failed to load hospitals', 'Unable to fetch hospital list');
+    } finally {
+      setLoadingHospitals(false);
+    }
+  };
+
+  const handleHospitalChange = (e) => {
+    const selectedHospitalId = e.target.value;
+    const selectedHospital = hospitals.find(h => h._id === selectedHospitalId);
+    
+    if (selectedHospital) {
+      setFormData({
+        ...formData,
+        hospitalId: selectedHospitalId,
+        hospitalName: selectedHospital.Hosp_Name || selectedHospital.name || ''
+      });
+    } else {
+      setFormData({
+        ...formData,
+        hospitalId: '',
+        hospitalName: ''
+      });
     }
   };
 
@@ -112,15 +149,32 @@ const EmergencySOS = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-zinc-700 mb-1">
-                Hospital Name *
+                Select Hospital *
               </label>
-              <input
-                type="text"
-                value={formData.hospitalName}
-                onChange={(e) => setFormData({...formData, hospitalName: e.target.value})}
-                className="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                required
-              />
+              {loadingHospitals ? (
+                <div className="w-full px-3 py-2 border border-zinc-300 rounded-lg bg-gray-50 text-gray-500">
+                  Loading hospitals...
+                </div>
+              ) : (
+                <select
+                  value={formData.hospitalId}
+                  onChange={handleHospitalChange}
+                  className="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  required
+                >
+                  <option value="">-- Select Hospital --</option>
+                  {hospitals.map((hospital) => (
+                    <option key={hospital._id} value={hospital._id}>
+                      {hospital.Hosp_Name || hospital.name} (ID: {hospital._id.slice(-8)})
+                    </option>
+                  ))}
+                </select>
+              )}
+              {formData.hospitalName && (
+                <p className="mt-1 text-xs text-gray-600">
+                  Selected: {formData.hospitalName}
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">

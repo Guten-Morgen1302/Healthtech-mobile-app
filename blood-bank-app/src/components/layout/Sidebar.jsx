@@ -1,8 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Droplets, Users, Heart, Building2, MessageSquare, Package, X, AlertCircle, Calendar, Trophy, Tent, Map, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, Droplets, Users, Heart, Building2, MessageSquare, Package, X, AlertCircle, Tent, Map, BarChart3 } from 'lucide-react';
+import { adminHospitalsAPI } from '../../services/api';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
+  const [pendingHospitalsCount, setPendingHospitalsCount] = useState(0);
+
+  useEffect(() => {
+    fetchPendingHospitals();
+    // Poll every 30 seconds
+    const interval = setInterval(fetchPendingHospitals, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchPendingHospitals = async () => {
+    try {
+      const response = await adminHospitalsAPI.getPending();
+      if (response.data.success) {
+        setPendingHospitalsCount(response.data.data.length);
+      }
+    } catch (err) {
+      // Silently fail - don't show error for background polling
+      console.error('Error fetching pending hospitals:', err);
+    }
+  };
+
   const navItems = [
     { name: 'Dashboard', path: '/app/dashboard', icon: LayoutDashboard },
     { name: 'Inventory', path: '/app/inventory', icon: Droplets },
@@ -12,8 +34,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     { name: 'Hospital Chats', path: '/app/chat', icon: MessageSquare },
     { name: 'Blood Requests', path: '/app/requests', icon: Package },
     { name: 'Emergency SOS', path: '/app/emergency', icon: AlertCircle },
-    { name: 'Appointments', path: '/app/appointments', icon: Calendar },
-    { name: 'Rewards', path: '/app/rewards', icon: Trophy },
     { name: 'Donation Camps', path: '/app/camps', icon: Tent },
     { name: 'Blood Stock Map', path: '/app/map', icon: Map },
     { name: 'Analytics', path: '/app/analytics', icon: BarChart3 },
@@ -73,7 +93,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 }
               >
                 <Icon className="h-4 w-4 flex-shrink-0" />
-                <span>{item.name}</span>
+                <span className="flex-1">{item.name}</span>
+                {item.path === '/app/hospitals' && pendingHospitalsCount > 0 && (
+                  <span className="px-2 py-0.5 bg-yellow-500 text-white text-xs font-bold rounded-full animate-pulse">
+                    {pendingHospitalsCount}
+                  </span>
+                )}
               </NavLink>
             );
           })}

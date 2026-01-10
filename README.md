@@ -276,11 +276,14 @@ node seedHospitalCredentials.js
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:DC143C,100:8B0000&height=100&section=divider&text=Demo&fontColor=ffffff&fontSize=28">
 
-## 📽️ Demo Video
+## 📽️ Demo Video & Resources
 
 <div align="center">
-  <a href="https://drive.google.com/file/d/1M70fuFne4rrvDiAGySRf_rH1ukzX8Reg/view?usp=drive_link" target="_blank">
-    <img src="https://img.shields.io/badge/▶️-Watch_Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch Demo">
+  <a href="https://drive.google.com/drive/folders/18V3o-hKrVZ0IQu9waeMVGAfrjpz-JaYS?usp=sharing" target="_blank">
+    <img src="https://img.shields.io/badge/🎬-Video_&_Report-FF0000?style=for-the-badge&logo=googledrive&logoColor=white" alt="Video & Report">
+  </a>
+  <a href="https://drive.google.com/drive/folders/1A3ybeIfsK_nBmMxsI9vI7InpUm2D407R?usp=sharing" target="_blank">
+    <img src="https://img.shields.io/badge/📊-Presentation-4285F4?style=for-the-badge&logo=googledrive&logoColor=white" alt="Presentation">
   </a>
 </div>
 

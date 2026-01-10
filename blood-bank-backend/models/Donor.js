@@ -36,10 +36,10 @@ const donorSchema = new mongoose.Schema({
     default: Date.now
   },
   City_Id: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.Mixed,  // Accept both Number and ObjectId for backward compatibility
     ref: 'City'
   },
-  
+
   // Old fields for backward compatibility (will be removed later)
   name: {
     type: String,
@@ -75,12 +75,12 @@ const donorSchema = new mongoose.Schema({
 });
 
 // Virtual to get name from either field
-donorSchema.virtual('donorName').get(function() {
+donorSchema.virtual('donorName').get(function () {
   return this.Bd_Name || this.name;
 });
 
 // Pre-save hook to sync old and new fields
-donorSchema.pre('save', function(next) {
+donorSchema.pre('save', function (next) {
   // If new fields are set, sync to old fields
   if (this.Bd_Name) this.name = this.Bd_Name;
   if (this.Bd_Bgroup) this.bloodGroup = this.Bd_Bgroup;
@@ -90,7 +90,7 @@ donorSchema.pre('save', function(next) {
   }
   if (this.Bd_Phone) this.phone = this.Bd_Phone;
   if (this.Bd_reg_Date) this.registrationDate = this.Bd_reg_Date;
-  
+
   // If old fields are set, sync to new fields
   if (this.name && !this.Bd_Name) this.Bd_Name = this.name;
   if (this.bloodGroup && !this.Bd_Bgroup) this.Bd_Bgroup = this.bloodGroup;
@@ -100,7 +100,7 @@ donorSchema.pre('save', function(next) {
   }
   if (this.phone && !this.Bd_Phone) this.Bd_Phone = this.phone;
   if (this.registrationDate && !this.Bd_reg_Date) this.Bd_reg_Date = this.registrationDate;
-  
+
   next();
 });
 

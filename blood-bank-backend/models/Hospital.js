@@ -23,10 +23,10 @@ const hospitalSchema = new mongoose.Schema({
     maxlength: 10
   },
   City_Id: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.Mixed,  // Accept both Number and ObjectId for backward compatibility
     ref: 'City'
   },
-  
+
   // Old fields for backward compatibility
   name: {
     type: String,
@@ -82,29 +82,29 @@ const hospitalSchema = new mongoose.Schema({
 });
 
 // Pre-save hook to sync fields
-hospitalSchema.pre('save', function(next) {
+hospitalSchema.pre('save', function (next) {
   // Sync new to old
   if (this.Hosp_Name) this.name = this.Hosp_Name;
   if (this.Hosp_Phone) this.phone = this.Hosp_Phone;
-  
+
   // Sync old to new
   if (this.name && !this.Hosp_Name) this.Hosp_Name = this.name;
   if (this.phone && !this.Hosp_Phone) this.Hosp_Phone = this.phone;
-  
+
   next();
 });
 
 // Hash password before saving
-hospitalSchema.pre('save', async function(next) {
+hospitalSchema.pre('save', async function (next) {
   if (!this.isModified('password') || !this.password) return next();
-  
+
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
 
 // Method to compare password
-hospitalSchema.methods.comparePassword = async function(candidatePassword) {
+hospitalSchema.methods.comparePassword = async function (candidatePassword) {
   if (!this.password) return false;
   return await bcrypt.compare(candidatePassword, this.password);
 };

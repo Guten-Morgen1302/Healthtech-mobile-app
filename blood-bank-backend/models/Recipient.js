@@ -39,10 +39,10 @@ const recipientSchema = new mongoose.Schema({
     default: Date.now
   },
   City_Id: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.Mixed,  // Accept both Number and ObjectId for backward compatibility
     ref: 'City'
   },
-  
+
   // Old fields for backward compatibility
   name: {
     type: String,
@@ -82,7 +82,7 @@ const recipientSchema = new mongoose.Schema({
 });
 
 // Pre-save hook to sync fields
-recipientSchema.pre('save', function(next) {
+recipientSchema.pre('save', function (next) {
   // Sync new to old
   if (this.Reci_Name) this.name = this.Reci_Name;
   if (this.Reci_Bgrp) this.bloodGroup = this.Reci_Bgrp;
@@ -93,7 +93,7 @@ recipientSchema.pre('save', function(next) {
   }
   if (this.Reci_Phone) this.phone = this.Reci_Phone;
   if (this.Reci_Date) this.requestDate = this.Reci_Date;
-  
+
   // Sync old to new
   if (this.name && !this.Reci_Name) this.Reci_Name = this.name;
   if (this.bloodGroup && !this.Reci_Bgrp) this.Reci_Bgrp = this.bloodGroup;
@@ -104,7 +104,7 @@ recipientSchema.pre('save', function(next) {
   }
   if (this.phone && !this.Reci_Phone) this.Reci_Phone = this.phone;
   if (this.requestDate && !this.Reci_Date) this.Reci_Date = this.requestDate;
-  
+
   next();
 });
 
